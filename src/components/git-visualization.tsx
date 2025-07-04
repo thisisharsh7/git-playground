@@ -538,7 +538,7 @@ export function GitVisualization({ onNavigateToLesson }: GitVisualizationProps) 
               onClick={() => onNavigateToLesson?.('branching')}
             >
               <span className="font-semibold text-blue-600 mb-2">🌿 Practice Branching</span>
-              <span className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <span className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed overflow-hidden text-ellipsis whitespace-nowrap w-full">
                 Learn to create and switch between branches interactively
               </span>
             </Button>
@@ -548,7 +548,7 @@ export function GitVisualization({ onNavigateToLesson }: GitVisualizationProps) 
               onClick={() => onNavigateToLesson?.('git-basics')}
             >
               <span className="font-semibold text-green-600 mb-2">📦 Try Git Basics</span>
-              <span className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <span className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed overflow-hidden text-ellipsis whitespace-nowrap w-full">
                 Master the fundamental Git workflow with hands-on practice
               </span>
             </Button>
@@ -558,7 +558,7 @@ export function GitVisualization({ onNavigateToLesson }: GitVisualizationProps) 
               onClick={() => onNavigateToLesson?.('remote-repos')}
             >
               <span className="font-semibold text-purple-600 mb-2">🌐 Remote Repositories</span>
-              <span className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <span className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed overflow-hidden text-ellipsis whitespace-nowrap w-full">
                 Learn collaboration with push, pull, and remote workflows
               </span>
             </Button>

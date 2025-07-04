@@ -75,7 +75,7 @@
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: var(--sidebar-ring);
 }
 
 .dark {
@@ -118,5 +118,24 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Custom responsive utilities for extra small screens */
+@layer utilities {
+  /* Extra small screens (480px and up) */
+  @media (min-width: 480px) {
+    .xs\:inline {
+      display: inline;
+    }
+    .xs\:hidden {
+      display: none;
+    }
+    .xs\:block {
+      display: block;
+    }
+    .xs\:flex {
+      display: flex;
+    }
   }
 }

@@ -97,7 +97,7 @@ export default function Home() {
         {/* Learning Path */}
         <div className="space-y-10 md:space-y-12 px-4">
           <div className="text-center">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent mb-4 md:mb-6">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent mb-3 md:mb-5 py-1">
               Your Git Learning Journey
             </h2>
             <p className="text-slate-600 dark:text-slate-300 text-lg md:text-xl lg:text-2xl font-medium">

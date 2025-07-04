@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -44,7 +44,7 @@ export default function GitPlaygroundPage() {
         id: 'a1b2c3d',
         message: 'Initial commit',
         author: 'Developer',
-        timestamp: new Date().toISOString(),
+        timestamp: '2024-01-01T12:00:00.000Z', // Fixed timestamp
         branch: 'main'
       }
     ],
@@ -60,7 +60,7 @@ export default function GitPlaygroundPage() {
     {
       command: 'git init',
       output: 'Initialized empty Git repository in /project/.git/',
-      timestamp: new Date().toISOString(),
+      timestamp: '2024-01-01T12:00:00.000Z', // Fixed timestamp
       success: true
     }
   ]);
@@ -75,126 +75,136 @@ export default function GitPlaygroundPage() {
     setIsClient(true);
   }, []);
 
+  // Safe timestamp formatting for SSR
+  const formatTimestamp = useCallback((timestamp: string): string => {
+    if (!isClient) return 'Loading...';
+    try {
+      return new Date(timestamp).toLocaleString();
+    } catch {
+      return 'Invalid date';
+    }
+  }, [isClient]);
+
   const executeCommand = (cmd: string) => {
     const trimmedCmd = cmd.trim();
     if (!trimmedCmd) return;
 
     setIsTyping(true);
-    
+
     // Simulate typing delay for better UX
     setTimeout(() => {
       let output = '';
       let success = true;
       const newGitState = { ...gitState };
 
-    // Parse and execute Git commands
-    const parts = trimmedCmd.split(' ');
-    const gitCommand = parts[1];
+      // Parse and execute Git commands
+      const parts = trimmedCmd.split(' ');
+      const gitCommand = parts[1];
 
-    switch (gitCommand) {
-      case 'status':
-        output = generateStatusOutput();
-        break;
-      case 'add':
-        if (parts[2] === '.') {
-          newGitState.stagingArea = [...newGitState.workingDirectory];
-          output = 'Added all files to staging area';
-        } else if (parts[2]) {
-          if (newGitState.workingDirectory.includes(parts[2])) {
-            if (!newGitState.stagingArea.includes(parts[2])) {
-              newGitState.stagingArea.push(parts[2]);
+      switch (gitCommand) {
+        case 'status':
+          output = generateStatusOutput();
+          break;
+        case 'add':
+          if (parts[2] === '.') {
+            newGitState.stagingArea = [...newGitState.workingDirectory];
+            output = 'Added all files to staging area';
+          } else if (parts[2]) {
+            if (newGitState.workingDirectory.includes(parts[2])) {
+              if (!newGitState.stagingArea.includes(parts[2])) {
+                newGitState.stagingArea.push(parts[2]);
+              }
+              output = `Added ${parts[2]} to staging area`;
+            } else {
+              output = `fatal: pathspec '${parts[2]}' did not match any files`;
+              success = false;
             }
-            output = `Added ${parts[2]} to staging area`;
+          }
+          break;
+        case 'commit':
+          if (newGitState.stagingArea.length > 0) {
+            const message = parts.slice(3).join(' ') || 'Commit message';
+            const newCommit = {
+              id: Math.random().toString(36).substr(2, 7),
+              message: message.replace(/['"]/g, ''),
+              author: 'Developer',
+              timestamp: new Date().toISOString(),
+              branch: newGitState.currentBranch
+            };
+            newGitState.commits.push(newCommit);
+            newGitState.stagingArea = [];
+            output = `[${newGitState.currentBranch} ${newCommit.id}] ${newCommit.message}`;
           } else {
-            output = `fatal: pathspec '${parts[2]}' did not match any files`;
+            output = 'nothing to commit, working tree clean';
             success = false;
           }
-        }
-        break;
-      case 'commit':
-        if (newGitState.stagingArea.length > 0) {
-          const message = parts.slice(3).join(' ') || 'Commit message';
-          const newCommit = {
-            id: Math.random().toString(36).substr(2, 7),
-            message: message.replace(/['"]/g, ''),
-            author: 'Developer',
-            timestamp: new Date().toISOString(),
-            branch: newGitState.currentBranch
-          };
-          newGitState.commits.push(newCommit);
-          newGitState.stagingArea = [];
-          output = `[${newGitState.currentBranch} ${newCommit.id}] ${newCommit.message}`;
-        } else {
-          output = 'nothing to commit, working tree clean';
-          success = false;
-        }
-        break;
-      case 'branch':
-        if (parts[2]) {
-          if (!newGitState.branches.includes(parts[2])) {
-            newGitState.branches.push(parts[2]);
-            output = `Created branch '${parts[2]}'`;
+          break;
+        case 'branch':
+          if (parts[2]) {
+            if (!newGitState.branches.includes(parts[2])) {
+              newGitState.branches.push(parts[2]);
+              output = `Created branch '${parts[2]}'`;
+            } else {
+              output = `fatal: A branch named '${parts[2]}' already exists.`;
+              success = false;
+            }
           } else {
-            output = `fatal: A branch named '${parts[2]}' already exists.`;
+            output = newGitState.branches.map(b =>
+              b === newGitState.currentBranch ? `* ${b}` : `  ${b}`
+            ).join('\n');
+          }
+          break;
+        case 'checkout':
+          if (parts[2] && newGitState.branches.includes(parts[2])) {
+            newGitState.currentBranch = parts[2];
+            output = `Switched to branch '${parts[2]}'`;
+          } else if (parts[2]) {
+            output = `error: pathspec '${parts[2]}' did not match any file(s) known to git`;
             success = false;
           }
-        } else {
-          output = newGitState.branches.map(b => 
-            b === newGitState.currentBranch ? `* ${b}` : `  ${b}`
-          ).join('\n');
-        }
-        break;
-      case 'checkout':
-        if (parts[2] && newGitState.branches.includes(parts[2])) {
-          newGitState.currentBranch = parts[2];
-          output = `Switched to branch '${parts[2]}'`;
-        } else if (parts[2]) {
-          output = `error: pathspec '${parts[2]}' did not match any file(s) known to git`;
-          success = false;
-        }
-        break;
-      case 'log':
-        output = newGitState.commits
-          .filter(c => c.branch === newGitState.currentBranch)
-          .reverse()
-          .map(c => `commit ${c.id}\nAuthor: ${c.author}\nDate: ${new Date(c.timestamp).toLocaleString()}\n\n    ${c.message}\n`)
-          .join('\n');
-        break;
-      case 'remote':
-        if (parts[2] === 'add' && parts[3] && parts[4]) {
-          newGitState.remotes.push(`${parts[3]} -> ${parts[4]}`);
-          output = `Added remote '${parts[3]}'`;
-        } else if (parts[2] === '-v') {
-          output = newGitState.remotes.join('\n') || 'No remotes configured';
-        }
-        break;
-      default:
-        if (trimmedCmd.startsWith('git')) {
-          output = `git: '${gitCommand}' is not a git command. See 'git --help'.`;
-          success = false;
-        } else {
-          output = `bash: ${trimmedCmd}: command not found`;
-          success = false;
-        }
-    }
+          break;
+        case 'log':
+          output = newGitState.commits
+            .filter(c => c.branch === newGitState.currentBranch)
+            .reverse()
+            .map(c => `commit ${c.id}\nAuthor: ${c.author}\nDate: ${formatTimestamp(c.timestamp)}\n\n    ${c.message}\n`)
+            .join('\n');
+          break;
+        case 'remote':
+          if (parts[2] === 'add' && parts[3] && parts[4]) {
+            newGitState.remotes.push(`${parts[3]} -> ${parts[4]}`);
+            output = `Added remote '${parts[3]}'`;
+          } else if (parts[2] === '-v') {
+            output = newGitState.remotes.join('\n') || 'No remotes configured';
+          }
+          break;
+        default:
+          if (trimmedCmd.startsWith('git')) {
+            output = `git: '${gitCommand}' is not a git command. See 'git --help'.`;
+            success = false;
+          } else {
+            output = `bash: ${trimmedCmd}: command not found`;
+            success = false;
+          }
+      }
 
-    const newCommand: CommandHistory = {
-      command: trimmedCmd,
-      output,
-      timestamp: new Date().toISOString(),
-      success
-    };
+      const newCommand: CommandHistory = {
+        command: trimmedCmd,
+        output,
+        timestamp: new Date().toISOString(),
+        success
+      };
 
-    setCommandHistory(prev => [...prev, newCommand]);
-    setGitState(newGitState);
-    setCommand('');
-    setIsTyping(false);
+      setCommandHistory(prev => [...prev, newCommand]);
+      setGitState(newGitState);
+      setCommand('');
+      setIsTyping(false);
     }, 300); // Reduced delay for better responsiveness
   };
 
   const generateStatusOutput = () => {
     let output = `On branch ${gitState.currentBranch}\n`;
-    
+
     if (gitState.stagingArea.length > 0) {
       output += '\nChanges to be committed:\n';
       output += '  (use "git reset HEAD <file>..." to unstage)\n\n';
@@ -202,7 +212,7 @@ export default function GitPlaygroundPage() {
         output += `\tmodified:   ${file}\n`;
       });
     }
-    
+
     const unstagedFiles = gitState.workingDirectory.filter(f => !gitState.stagingArea.includes(f));
     if (unstagedFiles.length > 0) {
       output += '\nChanges not staged for commit:\n';
@@ -211,11 +221,11 @@ export default function GitPlaygroundPage() {
         output += `\tmodified:   ${file}\n`;
       });
     }
-    
+
     if (gitState.stagingArea.length === 0 && unstagedFiles.length === 0) {
       output += 'nothing to commit, working tree clean';
     }
-    
+
     return output;
   };
 
@@ -227,13 +237,13 @@ export default function GitPlaygroundPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950" suppressHydrationWarning>
-      
+
       {/* Modern Hero Header */}
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 dark:from-blue-500/5 dark:via-purple-500/5 dark:to-pink-500/5 border-b border-slate-200/50 dark:border-slate-800/50">
         <div className="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800/25 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-4.5">
               <div className="relative">
                 <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl">
                   <Terminal className="w-10 h-10 text-white" />
@@ -243,13 +253,13 @@ export default function GitPlaygroundPage() {
                 </div>
               </div>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text py-1.5 text-transparent mb-2.5">
               Git Playground
             </h1>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-8">
               Master Git commands through interactive practice with real-time feedback and beautiful visualizations
             </p>
-            
+
             {/* Feature Pills */}
             <div className="flex flex-wrap justify-center gap-3">
               <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-slate-200/50 dark:border-slate-700/50">
@@ -272,35 +282,35 @@ export default function GitPlaygroundPage() {
       {/* Tabs Component with Sticky Navigation */}
       <Tabs value={selectedSection} onValueChange={setSelectedSection} className="w-full">
         {/* Sticky Tab Navigation */}
-        <div className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-            <TabsList className="grid w-full grid-cols-4 h-14 bg-slate-100/50 dark:bg-slate-800/50">
-              <TabsTrigger 
-                value="playground" 
+        <div className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md ">
+          <div className="max-w-7xl mx-auto">
+            <TabsList className="grid w-full px-2 sm:px-3 lg:px-8 xl:px-6 grid-cols-4 h-14 bg-slate-100/50 dark:bg-slate-800/50 border-0 rounded-none">
+              <TabsTrigger
+                value="playground"
                 className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-blue-600 dark:data-[state=active]:to-purple-600 dark:data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
               >
                 <Play className="w-4 h-4" />
                 <span className="hidden sm:inline font-medium">Playground</span>
                 <span className="sm:hidden font-medium">Play</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="lessons" 
+              <TabsTrigger
+                value="lessons"
                 className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-green-600 dark:data-[state=active]:to-emerald-600 dark:data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
               >
                 <BookOpen className="w-4 h-4" />
                 <span className="hidden sm:inline font-medium">Lessons</span>
                 <span className="sm:hidden font-medium">Learn</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="commands" 
+              <TabsTrigger
+                value="commands"
                 className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-orange-600 dark:data-[state=active]:to-amber-600 dark:data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
               >
                 <Command className="w-4 h-4" />
                 <span className="hidden sm:inline font-medium">Commands</span>
                 <span className="sm:hidden font-medium">Cmd</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="visualization" 
+              <TabsTrigger
+                value="visualization"
                 className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-purple-600 dark:data-[state=active]:to-pink-600 dark:data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
               >
                 <BarChart3 className="w-4 h-4" />
@@ -312,12 +322,12 @@ export default function GitPlaygroundPage() {
         </div>
 
         {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <TabsContent value="playground" className="space-y-8 mt-0">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 w-full max-w-full">
+          <TabsContent value="playground" className="space-y-8 mt-0">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              
+
               {/* Enhanced Terminal */}
-              <Card className="overflow-hidden border-0 shadow-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+              <Card className="overflow-hidden border-0  shadow-2xl bg-white/50 dark:bg-slate-900/50 py-0 backdrop-blur-sm">
                 <CardHeader className="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -337,9 +347,9 @@ export default function GitPlaygroundPage() {
                     </div>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent className="p-0">
-                  <div 
+                  <div
                     ref={terminalRef}
                     className="h-96 bg-slate-900 text-green-400 p-4 font-mono text-sm overflow-y-auto scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800"
                   >
@@ -359,7 +369,7 @@ export default function GitPlaygroundPage() {
                         </div>
                       </div>
                     ))}
-                    
+
                     {/* Current prompt */}
                     <div className="flex items-center gap-2 text-blue-400">
                       <span className="text-green-400 font-bold">➜</span>
@@ -376,7 +386,7 @@ export default function GitPlaygroundPage() {
                       )}
                     </div>
                   </div>
-                  
+
                   {/* Command Input */}
                   <div className="p-4 bg-slate-800 border-t border-slate-700">
                     <div className="flex gap-3">
@@ -391,8 +401,8 @@ export default function GitPlaygroundPage() {
                         disabled={isTyping}
                         className="font-mono bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400/20"
                       />
-                      <Button 
-                        onClick={() => executeCommand(command)} 
+                      <Button
+                        onClick={() => executeCommand(command)}
                         disabled={isTyping || !command.trim()}
                         className="px-6 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                       >
@@ -414,7 +424,7 @@ export default function GitPlaygroundPage() {
               </Card>
 
               {/* Modern Repository State */}
-              <Card className="overflow-hidden border-0 shadow-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+              <Card className="overflow-hidden border-0 shadow-2xl bg-white/50 dark:bg-slate-900/50  py-0 backdrop-blur-sm">
                 <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4">
                   <div className="flex items-center gap-3">
                     <GitBranch className="w-6 h-6" />
@@ -426,9 +436,9 @@ export default function GitPlaygroundPage() {
                     </div>
                   </div>
                 </CardHeader>
-                
-                <CardContent className="p-6 space-y-6 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
-                  
+
+                <CardContent className="px-6 space-y-6 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
+
                   {/* Current Branch */}
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
@@ -448,14 +458,13 @@ export default function GitPlaygroundPage() {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {gitState.branches.map(branch => (
-                        <Badge 
+                        <Badge
                           key={branch}
                           variant={branch === gitState.currentBranch ? "default" : "secondary"}
-                          className={`px-3 py-1 text-sm ${
-                            branch === gitState.currentBranch 
-                              ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md" 
-                              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
-                          }`}
+                          className={`px-3 py-1 text-sm ${branch === gitState.currentBranch
+                            ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md"
+                            : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+                            }`}
                         >
                           {branch === gitState.currentBranch ? "★ " : ""}{branch}
                         </Badge>
@@ -510,7 +519,7 @@ export default function GitPlaygroundPage() {
                             {commit.message}
                           </p>
                           <p className="text-xs text-slate-500 dark:text-slate-400">
-                            {new Date(commit.timestamp).toLocaleString()}
+                            {formatTimestamp(commit.timestamp)}
                           </p>
                         </div>
                       ))}
@@ -521,7 +530,7 @@ export default function GitPlaygroundPage() {
             </div>
 
             {/* Modern Quick Commands */}
-            <Card className="overflow-hidden border-0 shadow-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+            <Card className="overflow-hidden border-0 shadow-2xl bg-white/50 dark:bg-slate-900/50 pt-0 backdrop-blur-sm">
               <CardHeader className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white p-4">
                 <div className="flex items-center gap-3">
                   <Command className="w-6 h-6" />
@@ -533,7 +542,7 @@ export default function GitPlaygroundPage() {
                   </div>
                 </div>
               </CardHeader>
-              
+
               <CardContent className="p-6">
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {[
@@ -558,7 +567,7 @@ export default function GitPlaygroundPage() {
                     </Button>
                   ))}
                 </div>
-                
+
                 {/* Command Categories */}
                 <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
                   <div className="flex flex-wrap justify-center gap-3">

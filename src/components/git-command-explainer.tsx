@@ -76,15 +76,15 @@ export function GitCommandExplainer() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Search Interface */}
       <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-blue-500" />
+        <CardHeader className="pb-4 sm:pb-6">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
             Git Command Explainer
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm sm:text-base">
             Get instant, AI-like explanations for any Git command. Just type and learn!
           </CardDescription>
         </CardHeader>
@@ -95,7 +95,7 @@ export function GitCommandExplainer() {
               placeholder="Type a Git command (e.g., git cherry-pick, git rebase, merge...)"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="pl-10 text-base"
+              className="pl-10 text-sm sm:text-base h-10 sm:h-12"
             />
             {isSearching && (
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -128,7 +128,7 @@ export function GitCommandExplainer() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            
+
             {/* Detailed Explanation */}
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
               <h3 className="font-semibold mb-2 flex items-center gap-2">
@@ -216,11 +216,11 @@ export function GitCommandExplainer() {
                   className="w-full justify-start h-auto p-4"
                   onClick={() => handleCommandSelect(cmd)}
                 >
-                  <div className="text-left">
-                    <div className="font-mono font-semibold text-blue-600 dark:text-blue-400">
+                  <div className="text-left w-full">
+                    <div className="font-mono font-semibold text-blue-600 dark:text-blue-400 truncate">
                       {cmd.command}
                     </div>
-                    <div className="text-sm text-slate-600 dark:text-slate-400">
+                    <div className="text-sm text-slate-600 dark:text-slate-400 truncate">
                       {cmd.shortDescription}
                     </div>
                   </div>
