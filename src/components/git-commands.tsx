@@ -1,368 +1,237 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-
-interface GitCommand {
-  command: string;
-  description: string;
-  category: string;
-  usage: string;
-  examples: string[];
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-}
-
-const gitCommands: GitCommand[] = [
-  // Basic Commands
-  {
-    command: 'git init',
-    description: 'Initialize a new Git repository',
-    category: 'Basic',
-    usage: 'git init [directory]',
-    examples: ['git init', 'git init my-project'],
-    difficulty: 'Beginner'
-  },
-  {
-    command: 'git clone',
-    description: 'Clone a repository from remote source',
-    category: 'Basic',
-    usage: 'git clone <repository-url> [directory]',
-    examples: ['git clone https://github.com/user/repo.git', 'git clone https://github.com/user/repo.git my-folder'],
-    difficulty: 'Beginner'
-  },
-  {
-    command: 'git status',
-    description: 'Show the working tree status',
-    category: 'Basic',
-    usage: 'git status [options]',
-    examples: ['git status', 'git status --short'],
-    difficulty: 'Beginner'
-  },
-  {
-    command: 'git add',
-    description: 'Add file contents to the staging area',
-    category: 'Basic',
-    usage: 'git add <file>',
-    examples: ['git add file.txt', 'git add .', 'git add *.js'],
-    difficulty: 'Beginner'
-  },
-  {
-    command: 'git commit',
-    description: 'Record changes to the repository',
-    category: 'Basic',
-    usage: 'git commit [options]',
-    examples: ['git commit -m "Add new feature"', 'git commit -am "Fix bug"'],
-    difficulty: 'Beginner'
-  },
-  
-  // Branching Commands
-  {
-    command: 'git branch',
-    description: 'List, create, or delete branches',
-    category: 'Branching',
-    usage: 'git branch [options] [branch-name]',
-    examples: ['git branch', 'git branch feature-branch', 'git branch -d old-branch'],
-    difficulty: 'Beginner'
-  },
-  {
-    command: 'git checkout',
-    description: 'Switch branches or restore working tree files',
-    category: 'Branching',
-    usage: 'git checkout <branch-name>',
-    examples: ['git checkout main', 'git checkout -b new-feature', 'git checkout -- file.txt'],
-    difficulty: 'Beginner'
-  },
-  {
-    command: 'git merge',
-    description: 'Join two or more development histories together',
-    category: 'Branching',
-    usage: 'git merge <branch-name>',
-    examples: ['git merge feature-branch', 'git merge --no-ff feature'],
-    difficulty: 'Intermediate'
-  },
-  
-  // Remote Commands
-  {
-    command: 'git remote',
-    description: 'Manage set of tracked repositories',
-    category: 'Remote',
-    usage: 'git remote [options]',
-    examples: ['git remote -v', 'git remote add origin https://github.com/user/repo.git'],
-    difficulty: 'Beginner'
-  },
-  {
-    command: 'git push',
-    description: 'Update remote refs along with associated objects',
-    category: 'Remote',
-    usage: 'git push [remote] [branch]',
-    examples: ['git push origin main', 'git push -u origin feature-branch'],
-    difficulty: 'Beginner'
-  },
-  {
-    command: 'git pull',
-    description: 'Fetch from and integrate with another repository or branch',
-    category: 'Remote',
-    usage: 'git pull [remote] [branch]',
-    examples: ['git pull origin main', 'git pull --rebase origin main'],
-    difficulty: 'Beginner'
-  },
-  {
-    command: 'git fetch',
-    description: 'Download objects and refs from another repository',
-    category: 'Remote',
-    usage: 'git fetch [remote]',
-    examples: ['git fetch origin', 'git fetch --all'],
-    difficulty: 'Intermediate'
-  },
-  
-  // History Commands
-  {
-    command: 'git log',
-    description: 'Show commit logs',
-    category: 'History',
-    usage: 'git log [options]',
-    examples: ['git log', 'git log --oneline', 'git log --graph --all'],
-    difficulty: 'Beginner'
-  },
-  {
-    command: 'git diff',
-    description: 'Show changes between commits, commit and working tree, etc',
-    category: 'History',
-    usage: 'git diff [options]',
-    examples: ['git diff', 'git diff HEAD~1', 'git diff --staged'],
-    difficulty: 'Beginner'
-  },
-  {
-    command: 'git show',
-    description: 'Show various types of objects',
-    category: 'History',
-    usage: 'git show [object]',
-    examples: ['git show HEAD', 'git show commit-hash'],
-    difficulty: 'Intermediate'
-  },
-  
-  // Advanced Commands
-  {
-    command: 'git rebase',
-    description: 'Reapply commits on top of another base tip',
-    category: 'Advanced',
-    usage: 'git rebase [options] [upstream] [branch]',
-    examples: ['git rebase main', 'git rebase -i HEAD~3'],
-    difficulty: 'Advanced'
-  },
-  {
-    command: 'git stash',
-    description: 'Stash the changes in a dirty working directory away',
-    category: 'Advanced',
-    usage: 'git stash [options]',
-    examples: ['git stash', 'git stash pop', 'git stash list'],
-    difficulty: 'Intermediate'
-  },
-  {
-    command: 'git reset',
-    description: 'Reset current HEAD to the specified state',
-    category: 'Advanced',
-    usage: 'git reset [options] [commit]',
-    examples: ['git reset HEAD~1', 'git reset --hard HEAD~1', 'git reset --soft HEAD~1'],
-    difficulty: 'Advanced'
-  },
-  {
-    command: 'git cherry-pick',
-    description: 'Apply the changes introduced by some existing commits',
-    category: 'Advanced',
-    usage: 'git cherry-pick <commit>',
-    examples: ['git cherry-pick abc123', 'git cherry-pick -n abc123'],
-    difficulty: 'Advanced'
-  }
-];
+import { Search, Filter, BookOpen, Zap } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { GitCommandExplainer } from './git-command-explainer';
+import { GitExplainer, GitCommandExplanation } from '@/lib/git-explainer';
 
 export function GitCommands() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedCommand, setSelectedCommand] = useState<GitCommand | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
 
-  const categories = ['All', ...Array.from(new Set(gitCommands.map(cmd => cmd.category)))];
+  const allCommands = GitExplainer.getAllCommands();
   
-  const filteredCommands = gitCommands.filter(cmd => {
-    const matchesSearch = cmd.command.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         cmd.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || cmd.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+  const filteredCommands = allCommands.filter(cmd => {
+    const matchesSearch = !searchQuery || 
+      cmd.command.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cmd.shortDescription.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesCategory = selectedCategory === 'all' || cmd.category === selectedCategory;
+    const matchesDifficulty = selectedDifficulty === 'all' || cmd.difficulty === selectedDifficulty;
+    
+    return matchesSearch && matchesCategory && matchesDifficulty;
   });
+
+  const categories = ['all', 'basic', 'branching', 'remote', 'history', 'advanced', 'collaboration', 'maintenance'];
+  const difficulties = ['all', 'beginner', 'intermediate', 'advanced'];
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'Beginner': return 'bg-green-100 text-green-800';
-      case 'Intermediate': return 'bg-yellow-100 text-yellow-800';
-      case 'Advanced': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'beginner': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+      case 'intermediate': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
+      case 'advanced': return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
     }
   };
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'Basic': return 'bg-blue-100 text-blue-800';
-      case 'Branching': return 'bg-purple-100 text-purple-800';
-      case 'Remote': return 'bg-orange-100 text-orange-800';
-      case 'History': return 'bg-teal-100 text-teal-800';
-      case 'Advanced': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'basic': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
+      case 'branching': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400';
+      case 'remote': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
+      case 'history': return 'bg-teal-100 text-teal-800 dark:bg-teal-900/20 dark:text-teal-400';
+      case 'advanced': return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
+      case 'collaboration': return 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400';
+      case 'maintenance': return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
+      default: return 'bg-slate-100 text-slate-800 dark:bg-slate-900/20 dark:text-slate-400';
     }
   };
 
-  if (selectedCommand) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <Button variant="outline" onClick={() => setSelectedCommand(null)}>
-            ← Back to Commands
-          </Button>
-          <div className="flex gap-2">
-            <Badge className={getCategoryColor(selectedCommand.category)}>
-              {selectedCommand.category}
-            </Badge>
-            <Badge className={getDifficultyColor(selectedCommand.difficulty)}>
-              {selectedCommand.difficulty}
-            </Badge>
-          </div>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-mono text-xl">{selectedCommand.command}</CardTitle>
-            <CardDescription className="text-base">{selectedCommand.description}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            
-            {/* Usage */}
-            <div>
-              <h3 className="font-semibold mb-2">Usage:</h3>
-              <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg">
-                <code className="font-mono text-sm">{selectedCommand.usage}</code>
-              </div>
-            </div>
-
-            {/* Examples */}
-            <div>
-              <h3 className="font-semibold mb-2">Examples:</h3>
-              <div className="space-y-2">
-                {selectedCommand.examples.map((example, index) => (
-                  <div key={index} className="bg-black text-green-400 p-3 rounded-lg">
-                    <code className="font-mono text-sm">$ {example}</code>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Try it button */}
-            <div className="pt-4">
-              <Button className="w-full" onClick={() => {
-                // This would integrate with the playground
-                console.log('Try command:', selectedCommand.command);
-              }}>
-                Try in Playground
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      
-      {/* Search and Filter */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Git Command Reference</CardTitle>
-          <CardDescription>Search and explore Git commands by category</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Input
-            placeholder="Search commands..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          
-          <div className="flex flex-wrap gap-2">
-            {categories.map(category => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="explainer" className="w-full">
+        <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-xl p-2 mb-6 shadow-lg border-0">
+          <TabsList className="grid w-full grid-cols-2 bg-transparent">
+            <TabsTrigger 
+              value="explainer" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white transition-all duration-300"
+            >
+              <Zap className="h-4 w-4 mr-2" />
+              AI Explainer
+            </TabsTrigger>
+            <TabsTrigger 
+              value="reference" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white transition-all duration-300"
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              Command Reference
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-      {/* Commands Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredCommands.map((command) => (
-          <Card 
-            key={command.command}
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => setSelectedCommand(command)}
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="font-mono text-lg">{command.command}</CardTitle>
-                <Badge className={getDifficultyColor(command.difficulty)}>
-                  {command.difficulty}
-                </Badge>
-              </div>
-              <Badge className={getCategoryColor(command.category)} variant="outline">
-                {command.category}
-              </Badge>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-sm">
-                {command.description}
+        <TabsContent value="explainer">
+          <GitCommandExplainer />
+        </TabsContent>
+
+        <TabsContent value="reference" className="space-y-6">
+          {/* Filters */}
+          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Filter className="h-5 w-5" />
+                Filter Commands
+              </CardTitle>
+              <CardDescription>
+                Browse {allCommands.length} Git commands by category and difficulty
               </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Search commands..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              {/* Category and Difficulty Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Category</label>
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map(category => (
+                      <Button
+                        key={category}
+                        variant={selectedCategory === category ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setSelectedCategory(category)}
+                        className="text-xs capitalize"
+                      >
+                        {category}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Difficulty</label>
+                  <div className="flex flex-wrap gap-2">
+                    {difficulties.map(difficulty => (
+                      <Button
+                        key={difficulty}
+                        variant={selectedDifficulty === difficulty ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setSelectedDifficulty(difficulty)}
+                        className="text-xs capitalize"
+                      >
+                        {difficulty}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-sm text-slate-600 dark:text-slate-400">
+                Showing {filteredCommands.length} of {allCommands.length} commands
+              </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
 
-      {/* Quick Stats */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Command Statistics</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-blue-600">{gitCommands.length}</div>
-              <div className="text-sm text-slate-600">Total Commands</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-green-600">
-                {gitCommands.filter(c => c.difficulty === 'Beginner').length}
-              </div>
-              <div className="text-sm text-slate-600">Beginner</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-yellow-600">
-                {gitCommands.filter(c => c.difficulty === 'Intermediate').length}
-              </div>
-              <div className="text-sm text-slate-600">Intermediate</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-red-600">
-                {gitCommands.filter(c => c.difficulty === 'Advanced').length}
-              </div>
-              <div className="text-sm text-slate-600">Advanced</div>
-            </div>
+          {/* Commands Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredCommands.map((cmd, index) => (
+              <Card 
+                key={index} 
+                className="hover:shadow-lg transition-all duration-300 transform hover:scale-105 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-md"
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge className={getCategoryColor(cmd.category)} variant="secondary">
+                      {cmd.category}
+                    </Badge>
+                    <Badge className={getDifficultyColor(cmd.difficulty)} variant="secondary">
+                      {cmd.difficulty}
+                    </Badge>
+                  </div>
+                  <CardTitle className="font-mono text-lg text-blue-600 dark:text-blue-400">
+                    {cmd.command}
+                  </CardTitle>
+                  <CardDescription className="text-sm leading-relaxed">
+                    {cmd.shortDescription}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Use Case */}
+                  <div className="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
+                    <h4 className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                      When to use:
+                    </h4>
+                    <p className="text-xs text-slate-700 dark:text-slate-300">
+                      {cmd.useCase}
+                    </p>
+                  </div>
+
+                  {/* Example */}
+                  <div className="bg-black p-2 rounded text-xs">
+                    <code className="text-green-400 font-mono">
+                      $ {cmd.example}
+                    </code>
+                  </div>
+
+                  {/* Common Flags */}
+                  {cmd.commonFlags.length > 0 && (
+                    <div>
+                      <h4 className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">
+                        Common options:
+                      </h4>
+                      <div className="space-y-1">
+                        {cmd.commonFlags.slice(0, 2).map((flag, flagIndex) => (
+                          <div key={flagIndex} className="text-xs">
+                            <code className="bg-slate-200 dark:bg-slate-600 px-1 rounded font-mono text-blue-600 dark:text-blue-400">
+                              {flag.flag}
+                            </code>
+                            <span className="text-slate-600 dark:text-slate-400 ml-2">
+                              {flag.description}
+                            </span>
+                          </div>
+                        ))}
+                        {cmd.commonFlags.length > 2 && (
+                          <div className="text-xs text-slate-500">
+                            +{cmd.commonFlags.length - 2} more options
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </CardContent>
-      </Card>
+
+          {filteredCommands.length === 0 && (
+            <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+              <CardContent className="pt-6 text-center">
+                <div className="text-yellow-800 dark:text-yellow-400">
+                  <Search className="h-8 w-8 mx-auto mb-2" />
+                  <h3 className="font-semibold">No commands found</h3>
+                  <p className="text-sm mt-1">
+                    Try adjusting your search or filter criteria
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
