@@ -65,8 +65,11 @@ export function Navigation() {
     { href: '/git-playground', label: 'Playground', icon: '🎮' },
   ];
 
+  // Check if we're on the git-playground route to remove sticky behavior
+  const isPlaygroundRoute = pathname === '/git-playground';
+
   return (
-    <nav className="sticky top-0 z-50 border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm border-slate-200/50 dark:border-slate-700/50">
+    <nav className={`${isPlaygroundRoute ? '' : 'sticky top-0'} z-50 border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm border-slate-200/50 dark:border-slate-700/50`}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}

@@ -115,11 +115,11 @@ export function GitVisualization({ onNavigateToLesson }: GitVisualizationProps) 
           {/* Desktop Layout - Horizontal Flow */}
           <div className="hidden lg:block">
             <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-8">
-              <div className="relative" style={{ minHeight: '200px' }}>
+              <div className="relative overflow-x-auto" style={{ minHeight: '350px', minWidth: '800px' }}>
                 
                 {/* Working Directory */}
-                <div className="absolute top-0 left-0 w-48 bg-red-50 dark:bg-red-900/10 border-2 border-red-200 dark:border-red-800 rounded-xl p-4">
-                  <h3 className="font-bold text-red-700 dark:text-red-300 mb-3 text-center">📁 Working Directory</h3>
+                <div className="absolute top-0 left-0 w-44 bg-red-50 dark:bg-red-900/10 border-2 border-red-200 dark:border-red-800 rounded-xl p-3">
+                  <h3 className="font-bold text-red-700 dark:text-red-300 mb-3 text-center text-sm">📁 Working Directory</h3>
                   <div className="space-y-2">
                     <div className="bg-white dark:bg-slate-700 p-2 rounded text-xs">📄 index.html</div>
                     <div className="bg-white dark:bg-slate-700 p-2 rounded text-xs">📄 style.css</div>
@@ -128,15 +128,15 @@ export function GitVisualization({ onNavigateToLesson }: GitVisualizationProps) 
                 </div>
 
                 {/* Arrow 1 */}
-                <div className="absolute top-12 left-52 flex items-center">
-                  <div className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap">git add</div>
-                  <div className="w-8 h-0.5 bg-blue-500 mx-2"></div>
+                <div className="absolute top-16 left-48 flex items-center">
+                  <div className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap">git add</div>
+                  <div className="w-12 h-0.5 bg-blue-500"></div>
                   <div className="w-0 h-0 border-l-4 border-l-blue-500 border-t-2 border-t-transparent border-b-2 border-b-transparent"></div>
                 </div>
 
                 {/* Staging Area */}
-                <div className="absolute top-0 left-80 w-48 bg-yellow-50 dark:bg-yellow-900/10 border-2 border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
-                  <h3 className="font-bold text-yellow-700 dark:text-yellow-300 mb-3 text-center">📋 Staging Area</h3>
+                <div className="absolute top-0 left-78 w-44 bg-yellow-50 dark:bg-yellow-900/10 border-2 border-yellow-200 dark:border-yellow-800 rounded-xl p-3">
+                  <h3 className="font-bold text-yellow-700 dark:text-yellow-300 mb-3 text-center text-sm">📋 Staging Area</h3>
                   <div className="space-y-2">
                     <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded text-xs">📄 script.js</div>
                     <div className="text-xs text-slate-500 text-center">(staged)</div>
@@ -144,15 +144,15 @@ export function GitVisualization({ onNavigateToLesson }: GitVisualizationProps) 
                 </div>
 
                 {/* Arrow 2 */}
-                <div className="absolute top-12 left-[340px] flex items-center">
-                  <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap">git commit</div>
-                  <div className="w-8 h-0.5 bg-green-500 mx-2"></div>
+                <div className="absolute top-16 left-[500px] flex items-center">
+                  <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap">git commit</div>
+                  <div className="w-12 h-0.5 bg-green-500"></div>
                   <div className="w-0 h-0 border-l-4 border-l-green-500 border-t-2 border-t-transparent border-b-2 border-b-transparent"></div>
                 </div>
 
                 {/* Local Repository */}
-                <div className="absolute top-0 left-[420px] w-48 bg-green-50 dark:bg-green-900/10 border-2 border-green-200 dark:border-green-800 rounded-xl p-4">
-                  <h3 className="font-bold text-green-700 dark:text-green-300 mb-3 text-center">🗂️ Repository</h3>
+                <div className="absolute top-0 left-[640px] w-44 bg-green-50 dark:bg-green-900/10 border-2 border-green-200 dark:border-green-800 rounded-xl p-3">
+                  <h3 className="font-bold text-green-700 dark:text-green-300 mb-3 text-center text-sm">🗂️ Repository</h3>
                   <div className="space-y-2">
                     <div className="bg-white dark:bg-slate-700 p-2 rounded text-xs">📦 abc123</div>
                     <div className="bg-white dark:bg-slate-700 p-2 rounded text-xs">📦 def456</div>
@@ -160,19 +160,19 @@ export function GitVisualization({ onNavigateToLesson }: GitVisualizationProps) 
                 </div>
 
                 {/* Vertical Arrow */}
-                <div className="absolute top-32 left-[500px] flex flex-col items-center">
-                  <div className="w-0.5 h-8 bg-purple-500"></div>
+                <div className="absolute top-[160px] left-[725px] flex flex-col items-center">
+                  <div className="w-0.5 h-12 bg-purple-500"></div>
                   <div className="w-0 h-0 border-t-4 border-t-purple-500 border-l-2 border-l-transparent border-r-2 border-r-transparent"></div>
                 </div>
 
                 {/* Push/Pull Label */}
-                <div className="absolute top-36 left-[460px] bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                  git push/pull
+                <div className="absolute top-[140px] left-[680px] bg-purple-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                  git push/pullsdf
                 </div>
 
                 {/* Remote Repository */}
-                <div className="absolute top-44 left-[420px] w-48 bg-blue-50 dark:bg-blue-900/10 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-4">
-                  <h3 className="font-bold text-blue-700 dark:text-blue-300 mb-3 text-center">☁️ Remote Repo</h3>
+                <div className="absolute top-[220px] left-[640px] w-44 bg-blue-50 dark:bg-blue-900/10 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-3">
+                  <h3 className="font-bold text-blue-700 dark:text-blue-300 mb-3 text-center text-sm">☁️ Remote Repo</h3>
                   <div className="space-y-2">
                     <div className="bg-white dark:bg-slate-700 p-2 rounded text-xs text-center">🌐 origin/main</div>
                   </div>
@@ -216,8 +216,8 @@ export function GitVisualization({ onNavigateToLesson }: GitVisualizationProps) 
           <CardDescription>Visual representation of commit history and branches</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="relative bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
-            <div className="w-full h-80 relative">
+          <div className="relative bg-slate-50 dark:bg-slate-800 p-6 rounded-lg overflow-x-auto">
+            <div className="w-full min-w-[600px] h-80 relative">
               <svg width="100%" height="100%" viewBox="0 0 600 320" className="w-full h-full">
                 {/* Draw connections between commits */}
                 {commits.map(commit => 
@@ -232,7 +232,8 @@ export function GitVisualization({ onNavigateToLesson }: GitVisualizationProps) 
                           x2={commit.x}
                           y2={commit.y}
                           stroke={commit.branch === 'main' ? '#3b82f6' : '#10b981'}
-                          strokeWidth="2"
+                          strokeWidth="3"
+                          className="drop-shadow-sm"
                         />
                       );
                     }
@@ -246,36 +247,66 @@ export function GitVisualization({ onNavigateToLesson }: GitVisualizationProps) 
                     <circle
                       cx={commit.x}
                       cy={commit.y}
-                      r="6"
+                      r="8"
                       fill={commit.branch === 'main' ? '#3b82f6' : '#10b981'}
                       stroke="white"
-                      strokeWidth="2"
+                      strokeWidth="3"
+                      className="drop-shadow-md"
                     />
                     <text
-                      x={commit.x + 12}
-                      y={commit.y + 4}
-                      fontSize="11"
+                      x={commit.x + 15}
+                      y={commit.y + 5}
+                      fontSize="12"
                       fill="currentColor"
-                      className="text-slate-700 dark:text-slate-300"
+                      className="text-slate-700 dark:text-slate-300 font-medium"
                     >
                       {commit.message}
+                    </text>
+                    <text
+                      x={commit.x + 15}
+                      y={commit.y - 8}
+                      fontSize="10"
+                      fill="currentColor"
+                      className="text-slate-500 dark:text-slate-400 font-mono"
+                    >
+                      {commit.id}
                     </text>
                   </g>
                 ))}
               </svg>
               
               {/* Branch labels */}
-              <div className="absolute top-2 right-2 space-y-1 bg-white dark:bg-slate-700 p-2 rounded-lg border text-xs">
-                <h4 className="font-semibold">Branches:</h4>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  <span>main</span>
+              <div className="absolute top-4 right-4 space-y-2 bg-white dark:bg-slate-700 p-3 rounded-lg border shadow-lg text-sm">
+                <h4 className="font-semibold text-slate-900 dark:text-slate-100">Branches:</h4>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-blue-500 rounded-full shadow-sm"></div>
+                  <span className="font-medium">main</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span>feature</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-green-500 rounded-full shadow-sm"></div>
+                  <span className="font-medium">feature</span>
                 </div>
               </div>
+            </div>
+            
+            {/* Commit Details */}
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {commits.map(commit => (
+                <div key={commit.id} className="bg-white dark:bg-slate-700 p-3 rounded-lg border shadow-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={`w-3 h-3 rounded-full ${commit.branch === 'main' ? 'bg-blue-500' : 'bg-green-500'}`}></div>
+                    <code className="text-xs font-mono bg-slate-100 dark:bg-slate-600 px-2 py-1 rounded">
+                      {commit.id}
+                    </code>
+                  </div>
+                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-1">
+                    {commit.message}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Branch: {commit.branch}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </CardContent>

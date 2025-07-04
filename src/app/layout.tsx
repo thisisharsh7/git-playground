@@ -5,6 +5,7 @@ import { Navigation } from "@/components/navigation";
 import { SvgBackground } from "@/components/svg-background";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeScript } from "@/components/theme-script";
+import PathInspector from "@/components/PathInspector";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,7 @@ export default function RootLayout({
         >
           <SvgBackground />
           <Navigation />
+           {/* <PathInspector /> */}
           <main className="relative">
             {children}
           </main>

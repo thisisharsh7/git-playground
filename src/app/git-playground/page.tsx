@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GitLessons } from "@/components/git-lessons";
 import { GitCommands } from "@/components/git-commands";
 import { GitVisualization } from "@/components/git-visualization";
+import { Terminal, Play, BookOpen, Command, BarChart3, GitBranch, FileText, Clock, CheckCircle } from 'lucide-react';
 
 interface GitState {
   currentBranch: string;
@@ -100,7 +101,9 @@ export default function GitPlaygroundPage() {
           output = 'Added all files to staging area';
         } else if (parts[2]) {
           if (newGitState.workingDirectory.includes(parts[2])) {
-            newGitState.stagingArea.push(parts[2]);
+            if (!newGitState.stagingArea.includes(parts[2])) {
+              newGitState.stagingArea.push(parts[2]);
+            }
             output = `Added ${parts[2]} to staging area`;
           } else {
             output = `fatal: pathspec '${parts[2]}' did not match any files`;
@@ -186,7 +189,7 @@ export default function GitPlaygroundPage() {
     setGitState(newGitState);
     setCommand('');
     setIsTyping(false);
-    }, 500); // 500ms delay for typing effect
+    }, 300); // Reduced delay for better responsiveness
   };
 
   const generateStatusOutput = () => {
@@ -223,149 +226,162 @@ export default function GitPlaygroundPage() {
   }, [commandHistory]);
 
   return (
-    <div className="min-h-screen" suppressHydrationWarning>
-      {/* Hero Header - Scrolls away */}
-      <div className="bg-gradient-to-r from-blue-50/80 via-purple-50/80 to-pink-50/80 dark:from-slate-900/80 dark:via-slate-800/80 dark:to-slate-900/80 backdrop-blur-md px-4 md:px-6 py-12 border-b border-slate-200/50 dark:border-slate-700/50">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-6 mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-xl">
-              <span className="text-3xl">🎮</span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950" suppressHydrationWarning>
+      
+      {/* Modern Hero Header */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 dark:from-blue-500/5 dark:via-purple-500/5 dark:to-pink-500/5 border-b border-slate-200/50 dark:border-slate-800/50">
+        <div className="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800/25 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                  <Terminal className="w-10 h-10 text-white" />
+                </div>
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                </div>
+              </div>
             </div>
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                Git Playground
-              </h1>
-              <p className="text-slate-600 dark:text-slate-400 text-lg md:text-xl font-medium">
-                Master Git commands through interactive practice and real-time visualization
-              </p>
-            </div>
-          </div>
-          
-          {/* Stats */}
-          <div className="flex flex-wrap gap-4">
-            <div className="flex items-center gap-3 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm">
-              <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-              <span className="text-slate-700 dark:text-slate-300 font-medium">Interactive Terminal</span>
-            </div>
-            <div className="flex items-center gap-3 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm">
-              <span className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></span>
-              <span className="text-slate-700 dark:text-slate-300 font-medium">Real-time Visualization</span>
-            </div>
-            <div className="flex items-center gap-3 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm">
-              <span className="w-3 h-3 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></span>
-              <span className="text-slate-700 dark:text-slate-300 font-medium">Safe Learning Environment</span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent mb-4">
+              Git Playground
+            </h1>
+            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-8">
+              Master Git commands through interactive practice with real-time feedback and beautiful visualizations
+            </p>
+            
+            {/* Feature Pills */}
+            <div className="flex flex-wrap justify-center gap-3">
+              <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-slate-200/50 dark:border-slate-700/50">
+                <Terminal className="w-4 h-4 text-green-600 dark:text-green-400" />
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Live Terminal</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-slate-200/50 dark:border-slate-700/50">
+                <BarChart3 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Visual Feedback</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-slate-200/50 dark:border-slate-700/50">
+                <CheckCircle className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Safe Environment</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sticky Tabs Navigation */}
-      <div className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 py-2 sm:py-3">
-          <Tabs value={selectedSection} onValueChange={setSelectedSection}>
-            <TabsList className="h-9 sm:h-10 md:h-12">
-              <TabsTrigger value="playground">
-                <span className="text-base sm:text-lg mr-1 sm:mr-2">🎮</span>
-                <span className="text-xs sm:text-sm md:text-base font-medium truncate">
-                  <span className="hidden sm:inline">Playground</span>
-                  <span className="sm:hidden">Play</span>
-                </span>
+      {/* Tabs Component with Sticky Navigation */}
+      <Tabs value={selectedSection} onValueChange={setSelectedSection} className="w-full">
+        {/* Sticky Tab Navigation */}
+        <div className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+            <TabsList className="grid w-full grid-cols-4 h-14 bg-slate-100/50 dark:bg-slate-800/50">
+              <TabsTrigger 
+                value="playground" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-blue-600 dark:data-[state=active]:to-purple-600 dark:data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
+              >
+                <Play className="w-4 h-4" />
+                <span className="hidden sm:inline font-medium">Playground</span>
+                <span className="sm:hidden font-medium">Play</span>
               </TabsTrigger>
-              <TabsTrigger value="lessons">
-                <span className="text-base sm:text-lg mr-1 sm:mr-2">📚</span>
-                <span className="text-xs sm:text-sm md:text-base font-medium truncate">
-                  <span className="hidden sm:inline">Lessons</span>
-                  <span className="sm:hidden">Learn</span>
-                </span>
+              <TabsTrigger 
+                value="lessons" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-green-600 dark:data-[state=active]:to-emerald-600 dark:data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span className="hidden sm:inline font-medium">Lessons</span>
+                <span className="sm:hidden font-medium">Learn</span>
               </TabsTrigger>
-              <TabsTrigger value="commands">
-                <span className="text-base sm:text-lg mr-1 sm:mr-2">📋</span>
-                <span className="text-xs sm:text-sm md:text-base font-medium truncate">
-                  <span className="hidden sm:inline">Commands</span>
-                  <span className="sm:hidden">Cmd</span>
-                </span>
+              <TabsTrigger 
+                value="commands" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-orange-600 dark:data-[state=active]:to-amber-600 dark:data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
+              >
+                <Command className="w-4 h-4" />
+                <span className="hidden sm:inline font-medium">Commands</span>
+                <span className="sm:hidden font-medium">Cmd</span>
               </TabsTrigger>
-              <TabsTrigger value="visualization">
-                <span className="text-base sm:text-lg mr-1 sm:mr-2">📊</span>
-                <span className="text-xs sm:text-sm md:text-base font-medium truncate">
-                  <span className="hidden sm:inline">Visualization</span>
-                  <span className="sm:hidden">Visual</span>
-                </span>
+              <TabsTrigger 
+                value="visualization" 
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-purple-600 dark:data-[state=active]:to-pink-600 dark:data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
+              >
+                <BarChart3 className="w-4 h-4" />
+                <span className="hidden sm:inline font-medium">Visualization</span>
+                <span className="sm:hidden font-medium">Visual</span>
               </TabsTrigger>
             </TabsList>
-          </Tabs>
+          </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto p-4 md:p-6 pb-12">
-        <Tabs value={selectedSection} onValueChange={setSelectedSection}>
-          <TabsContent value="playground" className="space-y-8 mt-0">
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <TabsContent value="playground" className="space-y-8 mt-0">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               
-              {/* Terminal */}
-              <Card className="h-[500px] md:h-[600px] flex flex-col bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-0 shadow-2xl ring-1 ring-slate-200/50 dark:ring-slate-700/50">
-                <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-t-lg border-b border-slate-200/50 dark:border-slate-600/50">
+              {/* Enhanced Terminal */}
+              <Card className="overflow-hidden border-0 shadow-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+                <CardHeader className="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-4">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-3 text-xl md:text-2xl">
+                    <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 bg-red-500 rounded-full"></span>
-                        <span className="w-3 h-3 bg-yellow-500 rounded-full"></span>
-                        <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                       </div>
-                      <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent font-bold">
-                        Interactive Terminal
-                      </span>
-                    </CardTitle>
-                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                      <span>Live</span>
+                      <Terminal className="w-5 h-5 text-green-400" />
+                      <CardTitle className="text-lg font-bold text-green-400">
+                        git-playground
+                      </CardTitle>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span>LIVE</span>
                     </div>
                   </div>
-                  <CardDescription className="text-base text-slate-600 dark:text-slate-300 font-medium">
-                    Execute Git commands and see real-time results in a safe environment
-                  </CardDescription>
                 </CardHeader>
-                <CardContent className="flex-1 flex flex-col p-0">
+                
+                <CardContent className="p-0">
                   <div 
                     ref={terminalRef}
-                    className="flex-1 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-green-400 p-4 md:p-6 font-mono text-sm md:text-base overflow-y-auto border-b border-slate-600/50"
-                    style={{
-                      backgroundImage: `radial-gradient(circle at 25% 25%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
-                                       radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)`
-                    }}
+                    className="h-96 bg-slate-900 text-green-400 p-4 font-mono text-sm overflow-y-auto scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800"
                   >
                     {commandHistory.map((cmd, index) => (
                       <div key={index} className="mb-3 group">
-                        <div className="text-blue-400 break-all flex items-center gap-2">
-                          <span className="text-green-400">➜</span>
-                          <span className="text-cyan-400">git-playground</span>
-                          <span className="text-blue-400">git:(main)</span>
-                          <span className="text-white">$</span>
-                          <span>{cmd.command}</span>
+                        <div className="flex items-center gap-2 text-blue-400 break-all">
+                          <span className="text-green-400 font-bold">➜</span>
+                          <span className="text-cyan-400 font-medium">git-playground</span>
+                          <span className="text-blue-400">git:(</span>
+                          <span className="text-yellow-400 font-medium">{gitState.currentBranch}</span>
+                          <span className="text-blue-400">)</span>
+                          <span className="text-white font-bold">$</span>
+                          <span className="text-white">{cmd.command}</span>
                         </div>
-                        <div className={`${cmd.success ? 'text-green-300' : 'text-red-400'} whitespace-pre-wrap break-words ml-4 mt-1 opacity-90`}>
+                        <div className={`${cmd.success ? 'text-green-300' : 'text-red-400'} whitespace-pre-wrap break-words ml-4 mt-1 opacity-90 leading-relaxed`}>
                           {cmd.output}
                         </div>
                       </div>
                     ))}
+                    
+                    {/* Current prompt */}
                     <div className="flex items-center gap-2 text-blue-400">
-                      <span className="text-green-400">➜</span>
-                      <span className="text-cyan-400">git-playground</span>
-                      <span className="text-blue-400">git:(main)</span>
-                      <span className="text-white">$</span>
+                      <span className="text-green-400 font-bold">➜</span>
+                      <span className="text-cyan-400 font-medium">git-playground</span>
+                      <span className="text-blue-400">git:(</span>
+                      <span className="text-yellow-400 font-medium">{gitState.currentBranch}</span>
+                      <span className="text-blue-400">)</span>
+                      <span className="text-white font-bold">$</span>
                       {isClient && isTyping && (
-                        <span className="text-yellow-400 animate-pulse">Processing...</span>
+                        <span className="text-yellow-400 animate-pulse font-medium">Processing...</span>
                       )}
                       {isClient && !isTyping && (
                         <span className="w-2 h-4 bg-green-400 animate-pulse ml-1"></span>
                       )}
                     </div>
                   </div>
-                  <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200/50 dark:border-slate-600/50">
+                  
+                  {/* Command Input */}
+                  <div className="p-4 bg-slate-800 border-t border-slate-700">
                     <div className="flex gap-3">
-                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 font-mono text-sm">
-                        <span className="text-green-500">$</span>
+                      <div className="flex items-center gap-2 text-green-400 font-mono text-sm font-bold">
+                        <span>$</span>
                       </div>
                       <Input
                         value={command}
@@ -373,20 +389,23 @@ export default function GitPlaygroundPage() {
                         onKeyPress={(e) => e.key === 'Enter' && !isTyping && executeCommand(command)}
                         placeholder="Type your Git command here..."
                         disabled={isTyping}
-                        className="font-mono text-sm md:text-base bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500/20 disabled:opacity-50"
+                        className="font-mono bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400/20"
                       />
                       <Button 
                         onClick={() => executeCommand(command)} 
                         disabled={isTyping || !command.trim()}
-                        className="px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-6 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                       >
                         {isClient && isTyping ? (
                           <div className="flex items-center gap-2">
                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            <span>Running...</span>
+                            <span>Running</span>
                           </div>
                         ) : (
-                          'Execute'
+                          <div className="flex items-center gap-2">
+                            <Play className="w-4 h-4" />
+                            <span>Execute</span>
+                          </div>
                         )}
                       </Button>
                     </div>
@@ -394,72 +413,73 @@ export default function GitPlaygroundPage() {
                 </CardContent>
               </Card>
 
-              {/* Git State Visualization */}
-              <Card className="h-[500px] md:h-[600px] bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-0 shadow-2xl ring-1 ring-slate-200/50 dark:ring-slate-700/50">
-                <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-t-lg border-b border-slate-200/50 dark:border-slate-600/50">
-                  <CardTitle className="text-xl md:text-2xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-bold">
-                    Repository State
-                  </CardTitle>
-                  <CardDescription className="text-base text-slate-600 dark:text-slate-300 font-medium">
-                    Live visualization of your Git repository structure and changes
-                  </CardDescription>
+              {/* Modern Repository State */}
+              <Card className="overflow-hidden border-0 shadow-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+                <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4">
+                  <div className="flex items-center gap-3">
+                    <GitBranch className="w-6 h-6" />
+                    <div>
+                      <CardTitle className="text-lg font-bold">Repository State</CardTitle>
+                      <CardDescription className="text-purple-100">
+                        Live visualization of your Git repository
+                      </CardDescription>
+                    </div>
+                  </div>
                 </CardHeader>
-                <CardContent className="space-y-6 overflow-y-auto p-6">
+                
+                <CardContent className="p-6 space-y-6 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
                   
                   {/* Current Branch */}
-                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 p-4 rounded-xl border border-blue-200/50 dark:border-blue-700/50">
-                    <h3 className="font-bold mb-3 text-base md:text-lg flex items-center gap-2">
-                      <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                      Current Branch
-                    </h3>
-                    <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm md:text-base px-4 py-2 font-semibold shadow-lg">
-                      <span className="mr-2">🌿</span>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <GitBranch className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <h3 className="font-semibold text-slate-900 dark:text-slate-100">Current Branch</h3>
+                    </div>
+                    <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 text-sm font-medium shadow-lg">
                       {gitState.currentBranch}
                     </Badge>
                   </div>
 
-                  {/* Branches */}
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-4 rounded-xl border border-green-200/50 dark:border-green-700/50">
-                    <h3 className="font-bold mb-3 text-base md:text-lg flex items-center gap-2">
-                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                      All Branches
-                    </h3>
+                  {/* All Branches */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <GitBranch className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      <h3 className="font-semibold text-slate-900 dark:text-slate-100">All Branches</h3>
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       {gitState.branches.map(branch => (
                         <Badge 
                           key={branch}
-                          className={`text-sm px-3 py-1.5 font-medium shadow-sm ${
+                          variant={branch === gitState.currentBranch ? "default" : "secondary"}
+                          className={`px-3 py-1 text-sm ${
                             branch === gitState.currentBranch 
-                              ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg" 
-                              : "bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600"
+                              ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md" 
+                              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
                           }`}
                         >
-                          <span className="mr-1">
-                            {branch === gitState.currentBranch ? "🌟" : "🌿"}
-                          </span>
-                          {branch}
+                          {branch === gitState.currentBranch ? "★ " : ""}{branch}
                         </Badge>
                       ))}
                     </div>
                   </div>
 
                   {/* Working Directory */}
-                  <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 p-4 rounded-xl border border-orange-200/50 dark:border-orange-700/50">
-                    <h3 className="font-bold mb-3 text-base md:text-lg flex items-center gap-2">
-                      <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
-                      Working Directory
-                    </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                      <h3 className="font-semibold text-slate-900 dark:text-slate-100">Working Directory</h3>
+                    </div>
                     <div className="space-y-2">
                       {gitState.workingDirectory.map(file => (
-                        <div key={file} className="flex items-center justify-between bg-white/70 dark:bg-slate-700/70 p-3 rounded-lg border border-slate-200/50 dark:border-slate-600/50">
+                        <div key={file} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                           <div className="flex items-center gap-3">
-                            <span className="text-lg">📄</span>
-                            <span className="font-mono text-sm md:text-base text-slate-700 dark:text-slate-300 break-all">{file}</span>
+                            <FileText className="w-4 h-4 text-slate-500" />
+                            <span className="font-mono text-sm text-slate-700 dark:text-slate-300">{file}</span>
                           </div>
                           {gitState.stagingArea.includes(file) && (
-                            <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs px-2 py-1 shadow-sm">
-                              <span className="mr-1">✓</span>
-                              staged
+                            <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 text-xs px-2 py-1">
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Staged
                             </Badge>
                           )}
                         </div>
@@ -468,29 +488,28 @@ export default function GitPlaygroundPage() {
                   </div>
 
                   {/* Recent Commits */}
-                  <div className="bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 p-4 rounded-xl border border-violet-200/50 dark:border-violet-700/50">
-                    <h3 className="font-bold mb-3 text-base md:text-lg flex items-center gap-2">
-                      <span className="w-2 h-2 bg-violet-500 rounded-full animate-pulse"></span>
-                      Recent Commits
-                    </h3>
-                    <div className="space-y-3 max-h-40 overflow-y-auto">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                      <h3 className="font-semibold text-slate-900 dark:text-slate-100">Recent Commits</h3>
+                    </div>
+                    <div className="space-y-3">
                       {gitState.commits.slice(-3).reverse().map((commit, index) => (
-                        <div key={commit.id} className="bg-white/70 dark:bg-slate-700/70 p-3 rounded-lg border border-slate-200/50 dark:border-slate-600/50">
+                        <div key={commit.id} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="text-sm">🔗</span>
-                            <code className="font-mono text-xs text-violet-600 dark:text-violet-400 bg-violet-100 dark:bg-violet-900/30 px-2 py-1 rounded">
+                            <code className="text-xs font-mono bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-1 rounded">
                               {commit.id}
                             </code>
                             {index === 0 && (
-                              <Badge className="bg-gradient-to-r from-violet-500 to-purple-500 text-white text-xs px-2 py-0.5">
+                              <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 text-xs px-2 py-0.5">
                                 HEAD
                               </Badge>
                             )}
                           </div>
-                          <p className="text-sm md:text-base text-slate-700 dark:text-slate-300 font-medium break-words">
+                          <p className="text-sm text-slate-700 dark:text-slate-300 font-medium mb-1">
                             {commit.message}
                           </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
                             {new Date(commit.timestamp).toLocaleString()}
                           </p>
                         </div>
@@ -501,101 +520,62 @@ export default function GitPlaygroundPage() {
               </Card>
             </div>
 
-            {/* Quick Commands */}
-            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-0 shadow-2xl ring-1 ring-slate-200/50 dark:ring-slate-700/50">
-              <CardHeader className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-t-lg border-b border-slate-200/50 dark:border-slate-600/50">
-                <CardTitle className="text-xl md:text-2xl bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent font-bold">
-                  Quick Commands
-                </CardTitle>
-                <CardDescription className="text-base text-slate-600 dark:text-slate-300 font-medium">
-                  Click to execute common Git commands instantly
-                </CardDescription>
+            {/* Modern Quick Commands */}
+            <Card className="overflow-hidden border-0 shadow-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+              <CardHeader className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white p-4">
+                <div className="flex items-center gap-3">
+                  <Command className="w-6 h-6" />
+                  <div>
+                    <CardTitle className="text-lg font-bold">Quick Commands</CardTitle>
+                    <CardDescription className="text-cyan-100">
+                      Click to execute common Git commands instantly
+                    </CardDescription>
+                  </div>
+                </div>
               </CardHeader>
+              
               <CardContent className="p-6">
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => executeCommand('git status')} 
-                    className="h-12 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-800/30 dark:hover:to-emerald-800/30 text-green-700 dark:text-green-300 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                  >
-                    <span className="mr-2">📊</span>
-                    <span className="text-xs">git status</span>
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => executeCommand('git add .')} 
-                    className="h-12 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-blue-200 dark:border-blue-700 hover:from-blue-100 hover:to-cyan-100 dark:hover:from-blue-800/30 dark:hover:to-cyan-800/30 text-blue-700 dark:text-blue-300 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                  >
-                    <span className="mr-2">➕</span>
-                    <span className="text-xs">git add .</span>
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => executeCommand('git commit -m "Update files"')} 
-                    className="h-12 bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200 dark:border-purple-700 hover:from-purple-100 hover:to-violet-100 dark:hover:from-purple-800/30 dark:hover:to-violet-800/30 text-purple-700 dark:text-purple-300 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                  >
-                    <span className="mr-2">💾</span>
-                    <span className="text-xs">git commit</span>
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => executeCommand('git log')} 
-                    className="h-12 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 border-orange-200 dark:border-orange-700 hover:from-orange-100 hover:to-amber-100 dark:hover:from-orange-800/30 dark:hover:to-amber-800/30 text-orange-700 dark:text-orange-300 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                  >
-                    <span className="mr-2">📜</span>
-                    <span className="text-xs">git log</span>
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => executeCommand('git branch')} 
-                    className="h-12 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border-teal-200 dark:border-teal-700 hover:from-teal-100 hover:to-cyan-100 dark:hover:from-teal-800/30 dark:hover:to-cyan-800/30 text-teal-700 dark:text-teal-300 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                  >
-                    <span className="mr-2">🌿</span>
-                    <span className="text-xs">git branch</span>
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => executeCommand('git branch feature')} 
-                    className="h-12 bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 border-pink-200 dark:border-pink-700 hover:from-pink-100 hover:to-rose-100 dark:hover:from-pink-800/30 dark:hover:to-rose-800/30 text-pink-700 dark:text-pink-300 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                  >
-                    <span className="mr-2">🆕</span>
-                    <span className="text-xs">new branch</span>
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => executeCommand('git checkout feature')} 
-                    className="h-12 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-700 hover:from-indigo-100 hover:to-purple-100 dark:hover:from-indigo-800/30 dark:hover:to-purple-800/30 text-indigo-700 dark:text-indigo-300 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                  >
-                    <span className="mr-2">🔄</span>
-                    <span className="text-xs">checkout</span>
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => executeCommand('git remote -v')} 
-                    className="h-12 bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-900/20 dark:to-gray-900/20 border-slate-200 dark:border-slate-700 hover:from-slate-100 hover:to-gray-100 dark:hover:from-slate-800/30 dark:hover:to-gray-800/30 text-slate-700 dark:text-slate-300 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                  >
-                    <span className="mr-2">🌐</span>
-                    <span className="text-xs">git remote</span>
-                  </Button>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {[
+                    { cmd: 'git status', label: 'Status', icon: BarChart3, color: 'from-green-500 to-emerald-500' },
+                    { cmd: 'git add .', label: 'Add All', icon: CheckCircle, color: 'from-blue-500 to-cyan-500' },
+                    { cmd: 'git commit -m "Update files"', label: 'Commit', icon: CheckCircle, color: 'from-purple-500 to-violet-500' },
+                    { cmd: 'git log', label: 'Log', icon: Clock, color: 'from-orange-500 to-amber-500' },
+                    { cmd: 'git branch', label: 'Branches', icon: GitBranch, color: 'from-teal-500 to-cyan-500' },
+                    { cmd: 'git branch feature', label: 'New Branch', icon: GitBranch, color: 'from-pink-500 to-rose-500' },
+                    { cmd: 'git checkout feature', label: 'Checkout', icon: GitBranch, color: 'from-indigo-500 to-purple-500' },
+                    { cmd: 'git remote -v', label: 'Remotes', icon: GitBranch, color: 'from-slate-500 to-gray-500' },
+                  ].map((item, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      onClick={() => executeCommand(item.cmd)}
+                      disabled={isTyping}
+                      className={`h-16 flex flex-col items-center justify-center gap-2 bg-gradient-to-r ${item.color} text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50`}
+                    >
+                      <item.icon className="w-5 h-5" />
+                      <span className="text-xs font-medium">{item.label}</span>
+                    </Button>
+                  ))}
                 </div>
                 
                 {/* Command Categories */}
-                <div className="mt-6 pt-6 border-t border-slate-200/50 dark:border-slate-600/50">
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 text-xs px-3 py-1">
-                      <span className="mr-1">📊</span>
+                <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                      <BarChart3 className="w-3 h-3 mr-1" />
                       Status & Info
                     </Badge>
-                    <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 text-xs px-3 py-1">
-                      <span className="mr-1">💾</span>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                      <CheckCircle className="w-3 h-3 mr-1" />
                       Staging & Commits
                     </Badge>
-                    <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 text-xs px-3 py-1">
-                      <span className="mr-1">🌿</span>
+                    <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+                      <GitBranch className="w-3 h-3 mr-1" />
                       Branching
                     </Badge>
-                    <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 text-xs px-3 py-1">
-                      <span className="mr-1">🌐</span>
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
+                      <GitBranch className="w-3 h-3 mr-1" />
                       Remote
                     </Badge>
                   </div>
@@ -615,8 +595,8 @@ export default function GitPlaygroundPage() {
           <TabsContent value="visualization" className="mt-0">
             <GitVisualization onNavigateToLesson={handleNavigateToLesson} />
           </TabsContent>
-        </Tabs>
-      </div>
+        </div>
+      </Tabs>
     </div>
   );
 }
