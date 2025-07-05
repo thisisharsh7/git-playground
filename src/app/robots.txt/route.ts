@@ -1,11 +1,11 @@
 // src/app/robots.txt/route.ts
 export function GET() {
-  const content = `
-User-agent: *
+  const content = `User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /_next/
 Disallow: /private/
+Disallow: /_next/data/
+Allow: /_next/static/
 
 Sitemap: https://my-git-playground.vercel.app/sitemap.xml
 Host: https://my-git-playground.vercel.app
