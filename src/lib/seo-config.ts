@@ -2,8 +2,29 @@ import { Metadata } from 'next'
 
 export const baseUrl = 'https://my-git-playground.vercel.app'
 
-// Common SEO keywords
+// Brand-focused SEO configuration
+export const brandConfig = {
+  name: 'Git Master',
+  tagline: 'Interactive Git Learning Platform',
+  description: 'Master Git version control through hands-on practice',
+  domain: 'Git Master Platform',
+  company: 'Git Master',
+  author: 'Git Master Team',
+  social: {
+    twitter: '@gitmaster',
+    github: 'git-master',
+  }
+}
+
+// Common SEO keywords - emphasizing brand and functionality over hosting
 export const commonKeywords = [
+  // Brand keywords first
+  'git master',
+  'git master platform',
+  'git learning platform',
+  'interactive git tutorial',
+  
+  // Core functionality
   'git',
   'version control',
   'git tutorial',
@@ -23,10 +44,17 @@ export const commonKeywords = [
   'web development',
   'source control',
   'repository management',
-  'collaborative development'
+  'collaborative development',
+  
+  // Educational focus
+  'git education',
+  'git training',
+  'git course',
+  'git bootcamp',
+  'learn version control'
 ]
 
-// Base metadata configuration
+// Base metadata configuration with brand emphasis
 export const baseMetadata: Metadata = {
   metadataBase: new URL(baseUrl),
   robots: {
@@ -45,10 +73,10 @@ export const baseMetadata: Metadata = {
   verification: {
     google: "309dfde5f79964cc",
   },
-  authors: [{ name: "Git Master Team" }],
-  creator: "Git Master",
-  publisher: "Git Master",
-  applicationName: "Git Master",
+  authors: [{ name: brandConfig.author }],
+  creator: brandConfig.company,
+  publisher: brandConfig.company,
+  applicationName: brandConfig.name,
   category: "Education",
   classification: "Educational Software",
   icons: {
@@ -68,7 +96,7 @@ export const baseMetadata: Metadata = {
   manifest: "/site.webmanifest",
 }
 
-// Generate page-specific metadata
+// Generate page-specific metadata with brand emphasis
 export function generatePageMetadata({
   title,
   description,
@@ -82,23 +110,27 @@ export function generatePageMetadata({
   path?: string
   ogImage?: string
 }): Metadata {
-  const fullTitle = `${title} | Git Master`
+  // Emphasize brand in title structure
+  const fullTitle = `${title} - ${brandConfig.name} | ${brandConfig.tagline}`
   const url = `${baseUrl}${path}`
   const imageUrl = ogImage || `${baseUrl}/favicon.svg`
+  
+  // Brand-focused description
+  const brandedDescription = `${description} | ${brandConfig.name} - The leading platform for interactive Git learning and version control education.`
   
   return {
     ...baseMetadata,
     title: fullTitle,
-    description,
+    description: brandedDescription,
     keywords: [...commonKeywords, ...keywords],
     alternates: {
       canonical: url,
     },
     openGraph: {
       title: fullTitle,
-      description,
+      description: brandedDescription,
       url,
-      siteName: "Git Master",
+      siteName: brandConfig.name,
       type: "website",
       locale: "en_US",
       images: [
@@ -106,7 +138,7 @@ export function generatePageMetadata({
           url: imageUrl,
           width: 1200,
           height: 630,
-          alt: title,
+          alt: `${title} - ${brandConfig.name}`,
           type: "image/svg+xml",
         },
       ],
@@ -114,33 +146,34 @@ export function generatePageMetadata({
     twitter: {
       card: "summary_large_image",
       title: fullTitle,
-      description,
+      description: brandedDescription,
       images: [imageUrl],
-      creator: "@gitmaster",
-      site: "@gitmaster",
+      creator: brandConfig.social.twitter,
+      site: brandConfig.social.twitter,
     },
   }
 }
 
-// Page-specific SEO configurations
+// Page-specific SEO configurations with brand emphasis
 export const pageConfigs = {
   home: {
     title: "Interactive Git Learning Platform",
-    description: "Master Git version control with our interactive playground. Learn Git commands, visualize workflows, and understand version control through hands-on practice.",
+    description: "Master Git version control with our interactive playground. Learn Git commands, visualize workflows, and understand version control through hands-on practice",
     keywords: [
-      "git learning platform",
+      "git master platform",
       "interactive git tutorial",
-      "git master",
+      "git learning platform",
       "version control education",
       "git playground online",
       "learn git online",
-      "git visualization tool"
+      "git visualization tool",
+      "git master course"
     ],
     path: "",
   },
   playground: {
     title: "Git Playground - Interactive Learning",
-    description: "Practice Git commands in a safe, interactive environment. Execute real Git commands, visualize repository states, and learn through hands-on experience.",
+    description: "Practice Git commands in a safe, interactive environment. Execute real Git commands, visualize repository states, and learn through hands-on experience",
     keywords: [
       "git playground",
       "interactive git practice",
@@ -148,25 +181,27 @@ export const pageConfigs = {
       "git terminal online",
       "git simulator",
       "practice git commands",
-      "git learning environment"
+      "git learning environment",
+      "git master playground"
     ],
     path: "/git-playground",
   },
   playgroundTab: {
     title: "Interactive Git Terminal",
-    description: "Execute real Git commands in our interactive terminal. Practice Git operations with immediate visual feedback and learn version control hands-on.",
+    description: "Execute real Git commands in our interactive terminal. Practice Git operations with immediate visual feedback and learn version control hands-on",
     keywords: [
       "git terminal",
       "interactive git commands",
       "git command line",
       "practice git terminal",
-      "git cli practice"
+      "git cli practice",
+      "git master terminal"
     ],
     path: "/git-playground?tab=playground",
   },
   lessons: {
     title: "Git Lessons - Structured Learning",
-    description: "Learn Git through structured lessons covering basics to advanced topics. Progressive learning path from Git fundamentals to complex workflows.",
+    description: "Learn Git through structured lessons covering basics to advanced topics. Progressive learning path from Git fundamentals to complex workflows",
     keywords: [
       "git lessons",
       "git tutorial",
@@ -174,13 +209,14 @@ export const pageConfigs = {
       "git course",
       "git education",
       "git training",
-      "structured git learning"
+      "structured git learning",
+      "git master lessons"
     ],
     path: "/git-playground?tab=lessons",
   },
   commands: {
     title: "Git Commands Reference",
-    description: "Complete Git commands reference with examples, usage patterns, and detailed explanations. Search and filter 20+ essential Git commands.",
+    description: "Complete Git commands reference with examples, usage patterns, and detailed explanations. Search and filter 20+ essential Git commands",
     keywords: [
       "git commands",
       "git reference",
@@ -188,20 +224,22 @@ export const pageConfigs = {
       "git command examples",
       "git documentation",
       "git help",
-      "git command guide"
+      "git command guide",
+      "git master reference"
     ],
     path: "/git-playground?tab=commands",
   },
   visualization: {
     title: "Git Workflow Visualization",
-    description: "Understand Git workflows through interactive diagrams and visualizations. Learn branching strategies, merge vs rebase, and Git's three-tree architecture.",
+    description: "Understand Git workflows through interactive diagrams and visualizations. Learn branching strategies, merge vs rebase, and Git's three-tree architecture",
     keywords: [
       "git visualization",
       "git workflow diagrams",
       "git branching visualization",
       "git merge visualization",
       "git rebase visualization",
-      "git flow diagram"
+      "git flow diagram",
+      "git master visualization"
     ],
     path: "/git-playground?tab=visualization",
   },
@@ -211,32 +249,32 @@ export const pageConfigs = {
 export const commandConfigs = {
   add: {
     title: "Git Add Command - Stage Changes",
-    description: "Learn the git add command to stage changes for commit. Understand staging area, file patterns, and interactive staging with practical examples.",
-    keywords: ["git add", "staging area", "stage files", "git add examples"],
+    description: "Learn the git add command to stage changes for commit. Understand staging area, file patterns, and interactive staging with practical examples",
+    keywords: ["git add", "staging area", "stage files", "git add examples", "git master add"],
   },
   commit: {
     title: "Git Commit Command - Save Changes",
-    description: "Master the git commit command to save changes to repository history. Learn commit messages, amending commits, and best practices.",
-    keywords: ["git commit", "commit message", "save changes", "git commit examples"],
+    description: "Master the git commit command to save changes to repository history. Learn commit messages, amending commits, and best practices",
+    keywords: ["git commit", "commit message", "save changes", "git commit examples", "git master commit"],
   },
   push: {
     title: "Git Push Command - Upload Changes",
-    description: "Understand git push to upload local commits to remote repositories. Learn about remote branches, force push, and push strategies.",
-    keywords: ["git push", "remote repository", "upload changes", "git push examples"],
+    description: "Understand git push to upload local commits to remote repositories. Learn about remote branches, force push, and push strategies",
+    keywords: ["git push", "remote repository", "upload changes", "git push examples", "git master push"],
   },
   pull: {
     title: "Git Pull Command - Download Changes",
-    description: "Learn git pull to download and merge changes from remote repositories. Understand fetch vs pull and conflict resolution.",
-    keywords: ["git pull", "download changes", "merge remote", "git pull examples"],
+    description: "Learn git pull to download and merge changes from remote repositories. Understand fetch vs pull and conflict resolution",
+    keywords: ["git pull", "download changes", "merge remote", "git pull examples", "git master pull"],
   },
   branch: {
     title: "Git Branch Command - Manage Branches",
-    description: "Master git branch command for creating, listing, and managing branches. Learn branching strategies and branch workflows.",
-    keywords: ["git branch", "create branch", "branch management", "git branch examples"],
+    description: "Master git branch command for creating, listing, and managing branches. Learn branching strategies and branch workflows",
+    keywords: ["git branch", "create branch", "branch management", "git branch examples", "git master branch"],
   },
   merge: {
     title: "Git Merge Command - Combine Branches",
-    description: "Understand git merge to combine branches and integrate changes. Learn merge strategies, conflict resolution, and merge best practices.",
-    keywords: ["git merge", "combine branches", "merge conflicts", "git merge examples"],
+    description: "Understand git merge to combine branches and integrate changes. Learn merge strategies, conflict resolution, and merge best practices",
+    keywords: ["git merge", "combine branches", "merge conflicts", "git merge examples", "git master merge"],
   },
 }
