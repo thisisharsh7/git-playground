@@ -4,6 +4,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://my-git-playground.vercel.app'
   const currentDate = new Date()
   
+  // Helper function to create properly encoded URLs
+  const createUrl = (path: string, params?: Record<string, string>): string => {
+    const url = new URL(path, baseUrl)
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.set(key, value)
+      })
+    }
+    return url.toString()
+  }
+  
   return [
     // Home page - highest priority
     {
@@ -15,104 +26,74 @@ export default function sitemap(): MetadataRoute.Sitemap {
     
     // Main Git playground page
     {
-      url: `${baseUrl}/git-playground`,
+      url: createUrl('/git-playground'),
       lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 0.9,
     },
     
-    // Interactive playground section
+    // Tab sections with properly encoded URLs
     {
-      url: `${baseUrl}/git-playground?tab=playground`,
+      url: createUrl('/git-playground', { tab: 'playground' }),
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: createUrl('/git-playground', { tab: 'lessons' }),
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: createUrl('/git-playground', { tab: 'commands' }),
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: createUrl('/git-playground', { tab: 'visualization' }),
       lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     
-    // Learning lessons section
+    // Popular Git commands with properly encoded URLs
     {
-      url: `${baseUrl}/git-playground?tab=lessons`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    
-    // Git commands reference
-    {
-      url: `${baseUrl}/git-playground?tab=commands`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    
-    // Git visualization section
-    {
-      url: `${baseUrl}/git-playground?tab=visualization`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    
-    // Popular Git command searches
-    {
-      url: `${baseUrl}/git-playground?tab=commands&search=add`,
+      url: createUrl('/git-playground', { tab: 'commands', search: 'add' }),
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/git-playground?tab=commands&search=commit`,
+      url: createUrl('/git-playground', { tab: 'commands', search: 'commit' }),
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/git-playground?tab=commands&search=push`,
+      url: createUrl('/git-playground', { tab: 'commands', search: 'push' }),
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/git-playground?tab=commands&search=pull`,
+      url: createUrl('/git-playground', { tab: 'commands', search: 'pull' }),
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/git-playground?tab=commands&search=branch`,
+      url: createUrl('/git-playground', { tab: 'commands', search: 'branch' }),
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/git-playground?tab=commands&search=merge`,
+      url: createUrl('/git-playground', { tab: 'commands', search: 'merge' }),
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/git-playground?tab=commands&search=rebase`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/git-playground?tab=commands&search=status`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/git-playground?tab=commands&search=log`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/git-playground?tab=commands&search=diff`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.6,
     },
   ]
 }

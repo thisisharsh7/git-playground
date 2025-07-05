@@ -3,7 +3,7 @@
   <!-- Home page - highest priority -->
   <url>
     <loc>https://my-git-playground.vercel.app</loc>
-    <lastmod>2024-12-19</lastmod>
+    <lastmod>2025-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -11,111 +11,8 @@
   <!-- Main Git playground page -->
   <url>
     <loc>https://my-git-playground.vercel.app/git-playground</loc>
-    <lastmod>2024-12-19</lastmod>
+    <lastmod>2025-07-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
-  </url>
-  
-  <!-- Interactive playground section -->
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=playground</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Learning lessons section -->
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=lessons</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Git commands reference -->
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=commands</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Git visualization section -->
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=visualization</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Popular Git command searches -->
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=commands&amp;search=add</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=commands&amp;search=commit</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=commands&amp;search=push</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=commands&amp;search=pull</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=commands&amp;search=branch</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=commands&amp;search=merge</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=commands&amp;search=rebase</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=commands&amp;search=status</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=commands&amp;search=log</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://my-git-playground.vercel.app/git-playground?tab=commands&amp;search=diff</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
   </url>
 </urlset>
