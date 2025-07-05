@@ -14,7 +14,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/api/', '/_next/', '/private/'],
       },
     ],
-    sitemap: 'https://my-git-playground.vercel.app/sitemap.xml',
+    sitemap: 'https://my-git-playground.vercel.app/sitemaps/sitemap.xml',
     host: 'https://my-git-playground.vercel.app',
   }
 }
