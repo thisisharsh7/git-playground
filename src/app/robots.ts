@@ -13,6 +13,7 @@ export default function robots(): MetadataRoute.Robots {
         '/private/',
       ],
     },
+    // Use the manual sitemap to avoid XML encoding issues
     sitemap: `${baseUrl}/sitemap.xml`,
     host: baseUrl,
   }
