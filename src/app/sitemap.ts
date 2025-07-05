@@ -19,34 +19,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
-  const tabPages: MetadataRoute.Sitemap = [
-    {
-      url: `${baseUrl}/git-playground?tab=playground`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/git-playground?tab=lessons`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/git-playground?tab=commands`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/git-playground?tab=visualization`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-  ]
+  // const tabPages: MetadataRoute.Sitemap = [
+  //   {
+  //     url: `${baseUrl}/git-playground?tab=playground`,
+  //     lastModified: currentDate,
+  //     changeFrequency: 'weekly',
+  //     priority: 0.8,
+  //   },
+  //   {
+  //     url: `${baseUrl}/git-playground?tab=lessons`,
+  //     lastModified: currentDate,
+  //     changeFrequency: 'weekly',
+  //     priority: 0.8,
+  //   },
+  //   {
+  //     url: `${baseUrl}/git-playground?tab=commands`,
+  //     lastModified: currentDate,
+  //     changeFrequency: 'weekly',
+  //     priority: 0.8,
+  //   },
+  //   {
+  //     url: `${baseUrl}/git-playground?tab=visualization`,
+  //     lastModified: currentDate,
+  //     changeFrequency: 'weekly',
+  //     priority: 0.8,
+  //   },
+  // ]
   return [
     ...basePages,
-    ...tabPages
+    // ...tabPages
   ]
 }
