@@ -2,43 +2,117 @@ import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://my-git-playground.vercel.app'
+  const currentDate = new Date()
   
   return [
+    // Home page - highest priority
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'weekly',
-      priority: 1,
+      priority: 1.0,
     },
+    
+    // Main Git playground page
     {
       url: `${baseUrl}/git-playground`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
+      lastModified: currentDate,
+      changeFrequency: 'daily',
       priority: 0.9,
     },
+    
+    // Interactive playground section
     {
       url: `${baseUrl}/git-playground?tab=playground`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    
+    // Learning lessons section
     {
       url: `${baseUrl}/git-playground?tab=lessons`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    
+    // Git commands reference
     {
       url: `${baseUrl}/git-playground?tab=commands`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    
+    // Git visualization section
     {
       url: `${baseUrl}/git-playground?tab=visualization`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.8,
+    },
+    
+    // Popular Git command searches
+    {
+      url: `${baseUrl}/git-playground?tab=commands&search=add`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/git-playground?tab=commands&search=commit`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/git-playground?tab=commands&search=push`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/git-playground?tab=commands&search=pull`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/git-playground?tab=commands&search=branch`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/git-playground?tab=commands&search=merge`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/git-playground?tab=commands&search=rebase`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/git-playground?tab=commands&search=status`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/git-playground?tab=commands&search=log`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/git-playground?tab=commands&search=diff`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.6,
     },
   ]
 }
