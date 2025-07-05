@@ -2,11 +2,24 @@
   "name": "Git Master - Interactive Git Learning Platform",
   "short_name": "Git Master",
   "description": "Master Git version control with our interactive playground. Learn Git commands, visualize workflows, and understand version control through hands-on practice.",
-  "start_url": "/",
+  "start_url": "/git-playground",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#3b82f6",
   "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["education", "developer", "productivity"],
+  "screenshots": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "Git Master Playground"
+    }
+  ],
   "icons": [
     {
       "src": "/favicon.svg",
@@ -20,7 +33,50 @@
       "type": "image/x-icon"
     }
   ],
-  "categories": ["education", "developer", "productivity"],
-  "lang": "en",
-  "dir": "ltr"
+  "shortcuts": [
+    {
+      "name": "Git Playground",
+      "short_name": "Playground",
+      "description": "Interactive Git command playground",
+      "url": "/git-playground?tab=playground",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Git Lessons",
+      "short_name": "Lessons", 
+      "description": "Structured Git learning lessons",
+      "url": "/git-playground?tab=lessons",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Git Commands",
+      "short_name": "Commands",
+      "description": "Complete Git command reference",
+      "url": "/git-playground?tab=commands",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
 }

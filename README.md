@@ -2,6 +2,12 @@
 
 A comprehensive Git learning platform built with Next.js 15, shadcn/ui, and Tailwind CSS. This interactive playground helps beginner developers master Git version control through hands-on practice, visual learning, and real-time feedback.
 
+## 🌐 Live Demo
+
+**🚀 [Try Git Master Live](https://my-git-playground.vercel.app/git-playground)**
+
+Experience the full interactive Git learning platform deployed on Vercel with global CDN for fast loading worldwide.
+
 ## 🎯 Overview
 
 Git Master is designed specifically for beginner developers who want to learn Git in a safe, interactive environment. Unlike traditional tutorials, this platform provides real Git command execution with immediate visual feedback.
