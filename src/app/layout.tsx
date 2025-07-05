@@ -5,6 +5,7 @@ import { Navigation } from "@/components/navigation";
 import { SvgBackground } from "@/components/svg-background";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeScript } from "@/components/theme-script";
+import { generatePageMetadata, pageConfigs } from "@/lib/seo-config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,85 +17,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Get the base URL for metadata
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
-              process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
-              'https://my-git-playground.vercel.app';
-
-export const metadata: Metadata = {
-  metadataBase: new URL(baseUrl),
-  title: "Git Master - Interactive Git Learning Platform",
-  description: "Master Git version control with our interactive playground. Learn Git commands, visualize workflows, and understand version control through hands-on practice.",
-  keywords: ["Git", "version control", "learning", "interactive", "tutorial", "commands", "playground", "developer tools", "programming", "software development"],
-  authors: [{ name: "Git Master Team" }],
-  creator: "Git Master",
-  publisher: "Git Master",
-  applicationName: "Git Master",
-  category: "Education",
-  classification: "Educational Software",
-  icons: {
-    icon: [
-      {
-        url: "/favicon.svg",
-        type: "image/svg+xml",
-      },
-      {
-        url: "/favicon.ico",
-        sizes: "any",
-      },
-    ],
-    shortcut: "/favicon.svg",
-    apple: "/favicon.svg",
-  },
-  manifest: "/site.webmanifest",
-  openGraph: {
-    title: "Git Master - Interactive Git Learning Platform",
-    description: "Master Git version control with our interactive playground. Learn Git commands, visualize workflows, and understand version control through hands-on practice.",
-    url: "https://my-git-playground.vercel.app",
-    siteName: "Git Master",
-    type: "website",
-    locale: "en_US",
-    images: [
-      {
-        url: "https://my-git-playground.vercel.app/favicon.svg",
-        width: 1200,
-        height: 630,
-        alt: "Git Master - Interactive Git Learning Platform",
-        type: "image/svg+xml",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Git Master - Interactive Git Learning Platform",
-    description: "Master Git version control with our interactive playground. Learn Git commands, visualize workflows, and understand version control through hands-on practice.",
-    images: ["https://my-git-playground.vercel.app/favicon.svg"],
-    creator: "@gitmaster",
-    site: "@gitmaster",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    nocache: false,
-    googleBot: {
-      index: true,
-      follow: true,
-      noimageindex: false,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  alternates: {
-    canonical: "https://my-git-playground.vercel.app",
-  },
-  verification: {
-    // Add your verification codes here when you have them
-    // google: 'your-google-verification-code',
-    // yandex: 'your-yandex-verification-code',
-    // yahoo: 'your-yahoo-verification-code',
-  },
-};
+// Enhanced metadata with comprehensive SEO
+export const metadata: Metadata = generatePageMetadata(pageConfigs.home);
 
 export default function RootLayout({
   children,
