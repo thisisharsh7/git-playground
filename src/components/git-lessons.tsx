@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { InteractiveLesson } from "./interactive-lesson";
 import { QuizComponent } from "./quiz";
-import { quizzes, getQuizByLessonId } from "@/data/quizzes";
+import { getQuizByLessonId } from "@/data/quizzes";
 import { CheckCircle, Lock, Play, Trophy, BookOpen, ArrowRight } from 'lucide-react';
 
 interface Lesson {
@@ -231,7 +231,7 @@ export function GitLessons() {
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="font-semibold mb-3 text-lg">What you'll learn:</h3>
+                <h3 className="font-semibold mb-3 text-lg">What you&apos;ll learn:</h3>
                 <ul className="space-y-2">
                   {selectedLesson.topics.map((topic, index) => (
                     <li key={index} className="flex items-center gap-2">

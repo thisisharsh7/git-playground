@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GitCommandExplainer } from './git-command-explainer';
-import { GitExplainer, GitCommandExplanation } from '@/lib/git-explainer';
+import { GitExplainer } from '@/lib/git-explainer';
 
 export function GitCommands() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -320,7 +320,7 @@ export function GitCommands() {
                     </div>
                     <h3 className="text-base sm:text-lg font-bold mb-2">No commands found</h3>
                     <p className="text-sm text-yellow-700 dark:text-yellow-300 mb-4 max-w-md mx-auto">
-                      We couldn't find any Git commands matching your current search and filter criteria.
+                      We couldn&apos;t find any Git commands matching your current search and filter criteria.
                     </p>
                     <Button
                       variant="outline"

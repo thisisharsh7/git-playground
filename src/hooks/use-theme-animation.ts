@@ -72,7 +72,13 @@ export function useThemeAnimation() {
     await new Promise(resolve => setTimeout(resolve, duration / 2));
     
     // Apply the theme change
-    setTheme(newTheme);
+    if (newTheme === 'system') {
+      // For system theme, determine the actual theme based on system preference
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      setTheme(systemTheme);
+    } else {
+      setTheme(newTheme);
+    }
     
     // Wait for the rest of the animation
     await new Promise(resolve => setTimeout(resolve, duration / 2));

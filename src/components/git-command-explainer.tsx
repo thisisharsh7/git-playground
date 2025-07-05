@@ -269,7 +269,7 @@ export function GitCommandExplainer() {
               <span className="font-semibold">Command not found</span>
             </div>
             <p className="text-yellow-700 dark:text-yellow-300 mt-2">
-              I don't recognize "{query}". Try typing a Git command like "git commit", "cherry-pick", or "rebase".
+              I don&apos;t recognize &quot;{query}&quot;. Try typing a Git command like &quot;git commit&quot;, &quot;cherry-pick&quot;, or &quot;rebase&quot;.
             </p>
           </CardContent>
         </Card>

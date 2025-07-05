@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 
-function throttle(func: Function, delay: number) {
+function throttle(func: (...args: unknown[]) => void, delay: number) {
   let timeoutId: NodeJS.Timeout;
   let lastExecTime = 0;
   
-  return function (...args: any[]) {
+  return function (...args: unknown[]) {
     const currentTime = Date.now();
     
     if (currentTime - lastExecTime > delay) {

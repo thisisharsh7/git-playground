@@ -36,6 +36,7 @@ interface CommandHistory {
 
 export default function GitPlaygroundPage() {
   const [isClient, setIsClient] = useState(false);
+
   const [gitState, setGitState] = useState<GitState>({
     currentBranch: 'main',
     branches: ['main'],
@@ -64,12 +65,14 @@ export default function GitPlaygroundPage() {
       success: true
     }
   ]);
+  
   const [selectedSection, setSelectedSection] = useState('playground');
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  const handleNavigateToLesson = (lessonId: string) => {
+  const handleNavigateToLesson = useCallback((lessonId: string) => {
     setSelectedSection('lessons');
-  };
+    console.log('Navigating to lesson:', lessonId);
+  }, []);
 
   useEffect(() => {
     setIsClient(true);

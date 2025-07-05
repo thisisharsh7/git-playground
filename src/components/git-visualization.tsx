@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 interface CommitNode {
   id: string;
@@ -73,7 +72,7 @@ export function GitVisualization({ onNavigateToLesson }: GitVisualizationProps) 
                   </div>
                 </div>
                 <div className="flex flex-col items-center my-4">
-                  <div className="bg-green-500 text-white px-4 py-2 rounded-full text-sm font-medium">git commit -m "message"</div>
+                  <div className="bg-green-500 text-white px-4 py-2 rounded-full text-sm font-medium">git commit -m &quot;message&quot;</div>
                   <div className="w-0.5 h-6 bg-green-500 mt-2"></div>
                   <div className="w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-6 border-t-green-500"></div>
                 </div>

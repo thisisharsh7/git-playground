@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +46,23 @@ export function QuizComponent({ quiz, onComplete, onBack }: QuizProps) {
   const isLastQuestion = currentQuestionIndex === quiz.questions.length - 1;
   const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
 
+  const handleSubmitQuiz = useCallback(() => {
+    let correctAnswers = 0;
+    
+    quiz.questions.forEach(question => {
+      if (answers[question.id] === question.correctAnswer) {
+        correctAnswers++;
+      }
+    });
+
+    const finalScore = Math.round((correctAnswers / quiz.questions.length) * 100);
+    setScore(finalScore);
+    setShowResults(true);
+    
+    const passed = finalScore >= quiz.passingScore;
+    onComplete(passed, finalScore);
+  }, [quiz, answers, onComplete]);
+
   // Timer effect
   useEffect(() => {
     if (quizStarted && timeLeft !== null && timeLeft > 0 && !showResults) {
@@ -61,7 +78,7 @@ export function QuizComponent({ quiz, onComplete, onBack }: QuizProps) {
 
       return () => clearInterval(timer);
     }
-  }, [quizStarted, timeLeft, showResults]);
+  }, [quizStarted, timeLeft, showResults, handleSubmitQuiz]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -94,23 +111,6 @@ export function QuizComponent({ quiz, onComplete, onBack }: QuizProps) {
       setCurrentQuestionIndex(prev => prev - 1);
       setShowExplanation(false);
     }
-  };
-
-  const handleSubmitQuiz = () => {
-    let correctAnswers = 0;
-    
-    quiz.questions.forEach(question => {
-      if (answers[question.id] === question.correctAnswer) {
-        correctAnswers++;
-      }
-    });
-
-    const finalScore = Math.round((correctAnswers / quiz.questions.length) * 100);
-    setScore(finalScore);
-    setShowResults(true);
-    
-    const passed = finalScore >= quiz.passingScore;
-    onComplete(passed, finalScore);
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -166,7 +166,7 @@ export function QuizComponent({ quiz, onComplete, onBack }: QuizProps) {
                 <li>• You need {quiz.passingScore}% to pass and unlock the next lesson</li>
                 {quiz.timeLimit && <li>• You have {quiz.timeLimit} minutes to complete the quiz</li>}
                 <li>• You can review your answers before submitting</li>
-                <li>• You can retake the quiz if you don't pass</li>
+                <li>• You can retake the quiz if you don&apos;t pass</li>
               </ul>
             </div>
 
