@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Filter, BookOpen, Zap, Terminal, Code, Star, Clock, Users, Settings } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,10 +10,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GitCommandExplainer } from './git-command-explainer';
 import { GitExplainer } from '@/lib/git-explainer';
 
-export function GitCommands() {
-  const [searchQuery, setSearchQuery] = useState('');
+interface GitCommandsProps {
+  initialSearch?: string;
+}
+
+export function GitCommands({ initialSearch = '' }: GitCommandsProps) {
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
+
+  // Update search query when initialSearch prop changes
+  useEffect(() => {
+    if (initialSearch !== searchQuery) {
+      setSearchQuery(initialSearch);
+    }
+  }, [initialSearch, searchQuery]);
 
   const allCommands = GitExplainer.getAllCommands();
   

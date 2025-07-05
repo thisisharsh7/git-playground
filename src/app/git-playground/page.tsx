@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -34,8 +35,19 @@ interface CommandHistory {
   success: boolean;
 }
 
-export default function GitPlaygroundPage() {
+function GitPlaygroundContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const [isClient, setIsClient] = useState(false);
+
+  // Get URL parameters
+  const tabParam = searchParams.get('tab');
+  const searchQuery = searchParams.get('search') || '';
+  
+  // Validate and set initial tab
+  const validTabs = ['playground', 'lessons', 'commands', 'visualization'];
+  const initialTab = tabParam && validTabs.includes(tabParam) ? tabParam : 'playground';
 
   const [gitState, setGitState] = useState<GitState>({
     currentBranch: 'main',
@@ -66,13 +78,42 @@ export default function GitPlaygroundPage() {
     }
   ]);
   
-  const [selectedSection, setSelectedSection] = useState('playground');
+  const [selectedSection, setSelectedSection] = useState(initialTab);
   const terminalRef = useRef<HTMLDivElement>(null);
+
+  // Update URL when tab changes
+  const updateURL = useCallback((tab: string, search?: string) => {
+    const params = new URLSearchParams();
+    params.set('tab', tab);
+    if (search && search.trim()) {
+      params.set('search', search);
+    }
+    const newURL = `${pathname}?${params.toString()}`;
+    router.replace(newURL, { scroll: false });
+  }, [pathname, router]);
+
+  // Handle tab changes
+  const handleTabChange = useCallback((tab: string) => {
+    setSelectedSection(tab);
+    updateURL(tab, searchQuery);
+  }, [updateURL, searchQuery]);
 
   const handleNavigateToLesson = useCallback((lessonId: string) => {
     setSelectedSection('lessons');
+    updateURL('lessons');
     console.log('Navigating to lesson:', lessonId);
-  }, []);
+  }, [updateURL]);
+
+  // Sync with URL parameters on mount and when they change
+  useEffect(() => {
+    const validTabs = ['playground', 'lessons', 'commands', 'visualization'];
+    const currentTab = searchParams.get('tab');
+    const validTab = currentTab && validTabs.includes(currentTab) ? currentTab : 'playground';
+    
+    if (validTab !== selectedSection) {
+      setSelectedSection(validTab);
+    }
+  }, [searchParams, selectedSection]);
 
   useEffect(() => {
     setIsClient(true);
@@ -283,7 +324,7 @@ export default function GitPlaygroundPage() {
       </div>
 
       {/* Tabs Component with Sticky Navigation */}
-      <Tabs value={selectedSection} onValueChange={setSelectedSection} className="w-full">
+      <Tabs value={selectedSection} onValueChange={handleTabChange} className="w-full">
         {/* Sticky Tab Navigation */}
         <div className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md ">
           <div className="max-w-7xl mx-auto">
@@ -601,7 +642,7 @@ export default function GitPlaygroundPage() {
           </TabsContent>
 
           <TabsContent value="commands" className="mt-0">
-            <GitCommands />
+            <GitCommands initialSearch={searchQuery} />
           </TabsContent>
 
           <TabsContent value="visualization" className="mt-0">
@@ -610,5 +651,20 @@ export default function GitPlaygroundPage() {
         </div>
       </Tabs>
     </div>
+  );
+}
+
+export default function GitPlaygroundPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600 dark:text-slate-400">Loading Git Playground...</p>
+        </div>
+      </div>
+    }>
+      <GitPlaygroundContent />
+    </Suspense>
   );
 }

@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export function middleware() {
-  // Temporarily disable all redirects to prevent loops
-  // Just add security headers and continue
+  // Only add security headers, no redirects to prevent loops
   const response = NextResponse.next();
   
   // Add security headers

@@ -23,7 +23,7 @@ export default function Home() {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center px-4 pt-6">
-            <Link href="/git-playground">
+            <Link href="/git-playground?tab=playground">
               <Button 
                 size="lg" 
                 className="text-base md:text-lg lg:text-xl px-8 md:px-12 py-4 md:py-6 w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold"
@@ -142,7 +142,7 @@ export default function Home() {
                     <span>Basic commands: init, add, commit</span>
                   </div>
                 </div>
-                <Link href="/git-playground">
+                <Link href="/git-playground?tab=lessons">
                   <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 transition-all duration-300 text-base md:text-lg py-3 font-semibold">
                     Start with Basics
                   </Button>
@@ -185,7 +185,7 @@ export default function Home() {
                     <span>Conflict resolution</span>
                   </div>
                 </div>
-                <Link href="/git-playground">
+                <Link href="/git-playground?tab=visualization">
                   <Button variant="outline" className="w-full border-2 border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 text-base md:text-lg py-3 font-semibold">
                     Explore Advanced
                   </Button>
@@ -203,7 +203,7 @@ export default function Home() {
               <p className="text-lg md:text-xl lg:text-2xl opacity-90 max-w-3xl mx-auto mb-8 leading-relaxed font-medium">
                 Start with Git fundamentals or jump into advanced challenges. Both paths will make you a better developer.
               </p>
-              <Link href="/git-playground">
+              <Link href="/git-playground?tab=playground">
                 <Button 
                   size="lg" 
                   variant="secondary" 
