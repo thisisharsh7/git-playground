@@ -8,7 +8,6 @@ Disallow: /_next/data/
 Allow: /_next/static/
 
 Sitemap: https://my-git-playground.vercel.app/sitemap.xml
-Host: https://my-git-playground.vercel.app
 `.trim()
 
   return new Response(content, {
