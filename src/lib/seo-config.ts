@@ -11,7 +11,6 @@ export const brandConfig = {
   company: 'Git Master',
   author: 'Git Master Team',
   social: {
-    twitter: '@gitmaster',
     github: 'git-master',
   }
 }
@@ -148,8 +147,6 @@ export function generatePageMetadata({
       title: fullTitle,
       description: brandedDescription,
       images: [imageUrl],
-      creator: brandConfig.social.twitter,
-      site: brandConfig.social.twitter,
     },
   }
 }

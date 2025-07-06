@@ -2,15 +2,18 @@ import { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = 'https://my-git-playground.vercel.app'
-  
+
   return {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
+        allow: [
+          '/',
+          '/_next/static/', // ✅ allow static assets
+        ],
         disallow: [
           '/api/',
-          '/_next/',
+          '/_next/',         // ❌ this blocks everything under _next, including static (unless overridden above)
           '/private/',
           '/admin/',
           '/*.json$',
@@ -19,7 +22,10 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: 'Googlebot',
-        allow: '/',
+        allow: [
+          '/',
+          '/_next/static/', // ✅ allow static assets
+        ],
         disallow: [
           '/api/',
           '/_next/',
@@ -29,7 +35,10 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: 'Bingbot',
-        allow: '/',
+        allow: [
+          '/',
+          '/_next/static/', // ✅ allow static assets
+        ],
         disallow: [
           '/api/',
           '/_next/',
@@ -38,6 +47,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`
+    sitemap: `${baseUrl}/sitemap.xml`,
   }
 }

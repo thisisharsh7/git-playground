@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   
+  // Font optimization
+  optimizeFonts: true,
+  
   // Image optimization
   images: {
     formats: ['image/webp', 'image/avif'],

@@ -10,11 +10,15 @@ import { generatePageMetadata, pageConfigs, baseUrl } from "@/lib/seo-config";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
+  preload: false, // Disable automatic preload to prevent warning
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap", 
+  preload: false, // Disable automatic preload to prevent warning
 });
 
 // Enhanced metadata with comprehensive SEO
@@ -25,15 +29,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Enhanced structured data for SEO - emphasizing brand over hosting
+  // Enhanced structured data for SEO - emphasizing interactive playground
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Git Master",
-    "alternateName": "Git Master Platform",
-    "description": "Interactive Git learning platform with hands-on playground, structured lessons, and visual workflows. Master version control through practical experience.",
+    "alternateName": "Git Master Interactive Platform",
+    "description": "Interactive Git playground and command simulator. Practice Git version control in a safe environment with real-time visualization and hands-on learning tools.",
     "url": baseUrl,
-    "applicationCategory": "EducationalApplication",
+    "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Web Browser",
     "offers": {
       "@type": "Offer",
@@ -43,44 +47,29 @@ export default function RootLayout({
     "creator": {
       "@type": "Organization",
       "name": "Git Master",
-      "description": "Leading platform for interactive Git education and version control learning"
+      "description": "Interactive platform for Git version control practice and learning"
     },
     "publisher": {
       "@type": "Organization", 
       "name": "Git Master",
-      "description": "Educational technology platform specializing in Git and version control training"
+      "description": "Developer tools platform specializing in Git simulation and practice environments"
     },
-    "applicationSubCategory": "Developer Tools",
+    "applicationSubCategory": "Version Control Simulator",
     "browserRequirements": "Requires JavaScript. Requires HTML5.",
     "softwareVersion": "1.0.0",
     "datePublished": "2024-01-01",
     "dateModified": new Date().toISOString().split('T')[0],
     "inLanguage": "en-US",
     "isAccessibleForFree": true,
-    "educationalUse": "instruction",
-    "educationalLevel": "beginner to advanced",
-    "learningResourceType": "interactive tutorial",
-    "teaches": [
-      "Git version control",
-      "Git commands",
-      "Repository management", 
-      "Branching strategies",
-      "Merge and rebase workflows",
-      "Collaborative development"
-    ],
-    "audience": {
-      "@type": "EducationalAudience",
-      "educationalRole": "student",
-      "audienceType": "developers, programmers, software engineers"
-    },
+    "keywords": "git playground, git simulator, interactive git, version control practice, git visualization, developer tools",
     "featureList": [
-      "Interactive Git playground",
-      "Real-time command execution",
-      "Visual workflow diagrams",
-      "Structured learning lessons",
-      "Comprehensive command reference",
-      "Progress tracking",
-      "Hands-on practice environment"
+      "Interactive Git command terminal",
+      "Real-time repository state visualization",
+      "Git workflow simulation",
+      "Branch and merge visualization",
+      "Command reference library",
+      "Safe practice environment",
+      "Visual learning diagrams"
     ],
     "screenshot": `${baseUrl}/favicon.svg`,
     "aggregateRating": {
@@ -88,6 +77,10 @@ export default function RootLayout({
       "ratingValue": "4.8",
       "ratingCount": "150",
       "bestRating": "5"
+    },
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "software developers, programming students, version control learners"
     }
   };
 
@@ -112,26 +105,46 @@ export default function RootLayout({
     "serviceType": "Educational Technology"
   };
 
-  // Educational course structured data
-  const courseData = {
+  // Interactive playground/tool structured data
+  const playgroundData = {
     "@context": "https://schema.org",
-    "@type": "Course",
-    "name": "Interactive Git Mastery Course",
-    "description": "Comprehensive Git learning course with interactive playground, hands-on exercises, and visual workflows",
-    "provider": {
+    "@type": "SoftwareApplication",
+    "name": "Git Master Interactive Playground",
+    "description": "Interactive Git command playground and practice environment. Simulate Git operations, visualize repository states, and practice version control in a safe sandbox environment.",
+    "applicationCategory": "DeveloperApplication",
+    "applicationSubCategory": "Version Control Tool",
+    "operatingSystem": "Web Browser",
+    "url": `${baseUrl}/git-playground`,
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "creator": {
       "@type": "Organization",
       "name": "Git Master",
       "url": baseUrl
     },
-    "educationalLevel": "Beginner to Advanced",
-    "teaches": "Git version control, repository management, branching strategies",
-    "courseMode": "online",
-    "isAccessibleForFree": true,
-    "inLanguage": "en-US",
-    "availableLanguage": "English",
-    "coursePrerequisites": "Basic computer literacy",
-    "educationalUse": "instruction",
-    "learningResourceType": "interactive course"
+    "softwareVersion": "1.0.0",
+    "datePublished": "2024-01-01",
+    "dateModified": new Date().toISOString().split('T')[0],
+    "browserRequirements": "Requires JavaScript. Requires HTML5.",
+    "featureList": [
+      "Interactive Git command terminal",
+      "Real-time repository visualization", 
+      "Git command simulation",
+      "Branch and commit tree display",
+      "Safe practice environment",
+      "Command history tracking",
+      "Visual workflow diagrams"
+    ],
+    "keywords": "git playground, git simulator, git practice, version control sandbox, interactive git, git visualization",
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "developers, programmers, students learning git"
+    },
+    "usageInfo": "Practice Git commands in a simulated environment without affecting real repositories"
   };
 
   return (
@@ -158,7 +171,7 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(courseData),
+            __html: JSON.stringify(playgroundData),
           }}
         />
         
