@@ -53,46 +53,55 @@ describe('executeGitCommand', () => {
   })
 })
 
-// D1.1. These four pins are the reason the engine had to become directly
-// importable: the UI cannot observe input mutation, because setGitState is
-// still handed a fresh top-level object either way. The damage is latent until
-// something memoizes on gitState.commits — i.e. when the visualization is
-// wired to live state.
-describe('D1.1 the engine mutates the state it is given', () => {
-  it('pins: git branch mutates the input branches array', () => {
+// FIXED in Phase 4B. These assertions are the reason the engine had to become
+// directly importable: the UI cannot observe input mutation, because
+// setGitState is handed a fresh top-level object either way. The damage was
+// latent until something memoized on gitState.commits — i.e. once the
+// visualization is wired to live state.
+describe('D1.1 the engine does not mutate the state it is given', () => {
+  it('git branch leaves the input branches array alone', () => {
     const state = createInitialGitState()
-    run(state, 'git branch feature')
-    expect(state.branches).toEqual(['main', 'feature'])
+    const result = run(state, 'git branch feature')
+    expect(state.branches).toEqual(['main'])
+    expect(result.state.branches).toEqual(['main', 'feature'])
   })
 
-  it('pins: git commit mutates the input commits array', () => {
+  it('git commit leaves the input commits array alone', () => {
     const state = createInitialGitState()
     const staged = run(state, 'git add .').state
-    run(staged, 'git commit -m "x"')
-    expect(state.commits).toHaveLength(2)
+    const result = run(staged, 'git commit -m "x"')
+    expect(staged.commits).toHaveLength(1)
+    expect(result.state.commits).toHaveLength(2)
   })
 
-  it('pins: git add <file> mutates the input stagingArea array', () => {
+  it('git add <file> leaves the input stagingArea array alone', () => {
     const state = createInitialGitState()
-    run(state, 'git add README.md')
-    expect(state.stagingArea).toEqual(['README.md'])
+    const result = run(state, 'git add README.md')
+    expect(state.stagingArea).toEqual([])
+    expect(result.state.stagingArea).toEqual(['README.md'])
   })
 
-  it('pins: git remote add mutates the input remotes array', () => {
+  it('git remote add leaves the input remotes array alone', () => {
     const state = createInitialGitState()
-    run(state, 'git remote add origin https://example.com/r.git')
-    expect(state.remotes).toEqual(['origin -> https://example.com/r.git'])
+    const result = run(state, 'git remote add origin https://example.com/r.git')
+    expect(state.remotes).toEqual([])
+    expect(result.state.remotes).toEqual(['origin -> https://example.com/r.git'])
   })
 
-  // The planned direct immutability test. Phase 3 is a bug-for-bug move, so
-  // this fails today and it.fails() keeps CI green. Phase 4 deep-copies the six
-  // arrays at engine entry; this test will then start failing and must be
-  // converted to a plain it(), and the four pins above inverted.
-  it.fails('a pure engine should not touch its input state', () => {
+  it('returns a state whose arrays are not shared with the input', () => {
+    const state = createInitialGitState()
+    const result = run(state, 'git status')
+    for (const key of ['branches', 'commits', 'workingDirectory', 'stagingArea', 'remotes'] as const) {
+      expect(result.state[key], key).not.toBe(state[key])
+    }
+  })
+
+  it('does not touch its input state across a sequence of commands', () => {
     const state = createInitialGitState()
     const before = structuredClone(state)
     run(state, 'git branch feature')
     run(state, 'git add README.md')
+    run(state, 'git remote add origin https://example.com/r.git')
     expect(state).toEqual(before)
   })
 })

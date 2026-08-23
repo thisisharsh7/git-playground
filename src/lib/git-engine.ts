@@ -138,7 +138,18 @@ export function executeGitCommand(
 
   let output = '';
   let success = true;
-  const newGitState = { ...state };
+
+  // Copy every array. A spread alone shared them by reference, so the .push()
+  // calls below mutated the caller's state in place (D1.1). Commit objects are
+  // never mutated, only appended, so a shallow array copy is enough.
+  const newGitState: GitState = {
+    ...state,
+    branches: [...state.branches],
+    commits: [...state.commits],
+    workingDirectory: [...state.workingDirectory],
+    stagingArea: [...state.stagingArea],
+    remotes: [...state.remotes],
+  };
 
   // Split on runs of whitespace. Splitting on a single space meant any repeated
   // space produced an empty token, so `git  status` reported an empty
