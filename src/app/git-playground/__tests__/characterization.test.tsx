@@ -390,13 +390,25 @@ describe('pinned defects', () => {
     })
   })
 
-  describe('D1.14 focus is dropped while a command runs', () => {
-    it('pins: the input and quick buttons are disabled during the 300ms delay', async () => {
+  // FIXED in Phase 4C.
+  describe('D1.14 terminal focus', () => {
+    it('keeps the prompt enabled while a command runs', async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Status' }))
-      expect(screen.getByPlaceholderText(PLACEHOLDER)).toBeDisabled()
+      // Disabling the input used to blur it, dropping focus to <body>.
+      expect(screen.getByPlaceholderText(PLACEHOLDER)).not.toBeDisabled()
+      await settle()
+    })
+
+    it('returns focus to the prompt after a quick command', async () => {
+      await quick('Status')
+      expect(screen.getByPlaceholderText(PLACEHOLDER)).toHaveFocus()
+    })
+
+    it('still blocks overlapping commands via the quick buttons', async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Status' }))
       expect(screen.getByRole('button', { name: 'Status' })).toBeDisabled()
       await settle()
-      expect(screen.getByPlaceholderText(PLACEHOLDER)).not.toBeDisabled()
+      expect(screen.getByRole('button', { name: 'Status' })).not.toBeDisabled()
     })
   })
 })

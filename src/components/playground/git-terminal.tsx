@@ -1,6 +1,6 @@
 'use client';
 
-import type { RefObject } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,18 @@ export function GitTerminal({
   onCommandChange,
   onExecute,
 }: GitTerminalProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const wasTyping = useRef(false);
+
+  // Return focus to the prompt once a command finishes, so a click on a quick
+  // command does not leave focus stranded on the button (D1.14).
+  useEffect(() => {
+    if (wasTyping.current && !isTyping) {
+      inputRef.current?.focus();
+    }
+    wasTyping.current = isTyping;
+  }, [isTyping]);
+
   return (
     <Card className="overflow-hidden border-0  shadow-2xl bg-white/50 dark:bg-slate-900/50 py-0 backdrop-blur-sm">
       <CardHeader className="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-4">
@@ -97,12 +109,15 @@ export function GitTerminal({
             <div className="flex items-center gap-2 text-green-400 font-mono text-sm font-bold">
               <span>$</span>
             </div>
+            {/* Deliberately not disabled while a command runs: disabling blurs
+                the element and dropped focus to <body> after every command
+                (D1.14). Enter is still ignored mid-command. */}
             <Input
+              ref={inputRef}
               value={command}
               onChange={(e) => onCommandChange(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && !isTyping && onExecute()}
               placeholder="Type your Git command here..."
-              disabled={isTyping}
               className="font-mono bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400/20"
             />
             <Button
