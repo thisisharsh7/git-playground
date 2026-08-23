@@ -266,6 +266,27 @@ export function GitLessons({ initialLessonId = '' }: GitLessonsProps = {}) {
         />
       );
     }
+
+    // Recovery path. This used to fall through to the lesson detail view with
+    // isInQuizMode still set, which made "Take Quiz" a permanent no-op with no
+    // way out except Back (D2.8).
+    return (
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle>Quiz unavailable</CardTitle>
+          <CardDescription>
+            The quiz for &ldquo;{selectedLesson.title}&rdquo; could not be loaded. Your
+            progress has not been changed.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-3">
+          <Button onClick={handleBackToLessons}>Back to lessons</Button>
+          <Button variant="outline" onClick={() => setIsInQuizMode(false)}>
+            Back to lesson
+          </Button>
+        </CardContent>
+      </Card>
+    );
   }
 
   // Show interactive lesson if in interactive mode
