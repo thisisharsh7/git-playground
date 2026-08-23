@@ -156,6 +156,10 @@ export function executeGitCommand(
           output = `fatal: pathspec '${parts[2]}' did not match any files`;
           success = false;
         }
+      } else {
+        // Previously fell through with empty output and success: true (D1.7).
+        output = "Nothing specified, nothing added.\nhint: Maybe you wanted to say 'git add .'?";
+        success = false;
       }
       break;
     case 'commit':
@@ -241,6 +245,10 @@ export function executeGitCommand(
       } else if (arg) {
         output = `error: pathspec '${arg}' did not match any file(s) known to git`;
         success = false;
+      } else {
+        // Previously fell through with empty output and success: true (D1.7).
+        output = 'usage: git checkout <branch>';
+        success = false;
       }
       break;
     }
@@ -251,14 +259,29 @@ export function executeGitCommand(
         .map(c => `commit ${c.id}\nAuthor: ${c.author}\nDate: ${formatTimestamp(c.timestamp)}\n\n    ${c.message}\n`)
         .join('\n');
       break;
-    case 'remote':
-      if (parts[2] === 'add' && parts[3] && parts[4]) {
-        newGitState.remotes.push(`${parts[3]} -> ${parts[4]}`);
-        output = `Added remote '${parts[3]}'`;
-      } else if (parts[2] === '-v') {
+    case 'remote': {
+      const sub = parts[2];
+      if (sub === 'add') {
+        if (parts[3] && parts[4]) {
+          newGitState.remotes.push(`${parts[3]} -> ${parts[4]}`);
+          output = `Added remote '${parts[3]}'`;
+        } else {
+          // Previously fell through silently when the URL was missing (D1.7).
+          output = 'usage: git remote add <name> <url>';
+          success = false;
+        }
+      } else if (sub === '-v') {
         output = newGitState.remotes.join('\n') || 'No remotes configured';
+      } else if (!sub) {
+        // Bare `git remote` lists remote names. Empty output with success is
+        // correct here: that is what real git does with no remotes configured.
+        output = newGitState.remotes.map(r => r.split(' -> ')[0]).join('\n');
+      } else {
+        output = `error: Unknown subcommand: ${sub}`;
+        success = false;
       }
       break;
+    }
     default:
       if (trimmedCmd.startsWith('git')) {
         output = `git: '${gitCommand}' is not a git command. See 'git --help'.`;

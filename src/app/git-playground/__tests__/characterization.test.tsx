@@ -200,19 +200,35 @@ describe('pinned defects', () => {
     })
   })
 
-  describe('D1.7 missing arguments succeed silently', () => {
-    it('pins: bare git add produces no output at all', async () => {
-      const before = out()
-      await type('git add')
-      // The command is echoed but carries no output and no error.
-      expect(out()).not.toContain('Nothing specified')
-      expect(out()).not.toContain('fatal')
-      expect(out().length).toBeGreaterThan(before.length)
-    })
-
-    it.fails('bare git add should report that nothing was specified', async () => {
+  // FIXED in Phase 4A.
+  describe('D1.7 missing required arguments', () => {
+    it('bare git add reports that nothing was specified', async () => {
       await type('git add')
       expect(out()).toContain('Nothing specified, nothing added.')
+      expect(out()).toContain("hint: Maybe you wanted to say 'git add .'?")
+    })
+
+    it('bare git checkout prints usage', async () => {
+      await type('git checkout')
+      expect(out()).toContain('usage: git checkout <branch>')
+    })
+
+    it('git remote add without a url prints usage', async () => {
+      await type('git remote add origin')
+      expect(out()).toContain('usage: git remote add <name> <url>')
+    })
+
+    it('an unknown remote subcommand is reported', async () => {
+      await type('git remote rename a b')
+      expect(out()).toContain('error: Unknown subcommand: rename')
+    })
+
+    // Not an error: bare `git remote` lists remote names, and real git prints
+    // nothing when none are configured.
+    it('bare git remote lists configured remotes', async () => {
+      await type('git remote add origin https://example.com/r.git')
+      await type('git remote')
+      expect(out()).toContain('origin')
     })
   })
 
