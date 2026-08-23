@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Filter, BookOpen, Zap, Terminal, Code, Star, Clock, Users, Settings } from 'lucide-react';
+import { Search, Filter, BookOpen, Zap, Terminal, Code, Star, Clock, Users, Settings, Cloud, Rocket, Wrench } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +9,24 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GitCommandExplainer } from './git-command-explainer';
 import { GitExplainer } from '@/lib/git-explainer';
+
+/**
+ * Category filters. Each needs its own icon: the label is `hidden sm:inline`,
+ * so below the sm breakpoint these render icon-only — and remote/collaboration
+ * both used Users while advanced/maintenance both used Settings, leaving two
+ * indistinguishable pairs (D2.14). Hoisted out of the component both to keep it
+ * from being rebuilt every render and so the uniqueness rule is testable.
+ */
+export const commandCategories = [
+  { id: 'all', label: 'All', icon: Terminal },
+  { id: 'basic', label: 'Basic', icon: Star },
+  { id: 'branching', label: 'Branching', icon: Code },
+  { id: 'remote', label: 'Remote', icon: Cloud },
+  { id: 'history', label: 'History', icon: Clock },
+  { id: 'advanced', label: 'Advanced', icon: Rocket },
+  { id: 'collaboration', label: 'Collaboration', icon: Users },
+  { id: 'maintenance', label: 'Maintenance', icon: Wrench }
+] as const;
 
 interface GitCommandsProps {
   initialSearch?: string;
@@ -38,17 +56,6 @@ export function GitCommands({ initialSearch = '' }: GitCommandsProps) {
     return matchesSearch && matchesCategory && matchesDifficulty;
   });
 
-  const categories = [
-    { id: 'all', label: 'All', icon: Terminal },
-    { id: 'basic', label: 'Basic', icon: Star },
-    { id: 'branching', label: 'Branching', icon: Code },
-    { id: 'remote', label: 'Remote', icon: Users },
-    { id: 'history', label: 'History', icon: Clock },
-    { id: 'advanced', label: 'Advanced', icon: Settings },
-    { id: 'collaboration', label: 'Collaboration', icon: Users },
-    { id: 'maintenance', label: 'Maintenance', icon: Settings }
-  ];
-  
   const difficulties = [
     { id: 'all', label: 'All Levels' },
     { id: 'beginner', label: 'Beginner' },
@@ -79,7 +86,7 @@ export function GitCommands({ initialSearch = '' }: GitCommandsProps) {
   };
 
   const getCategoryIcon = (category: string) => {
-    const categoryObj = categories.find(cat => cat.id === category);
+    const categoryObj = commandCategories.find(cat => cat.id === category);
     return categoryObj?.icon || Terminal;
   };
 
@@ -163,7 +170,7 @@ export function GitCommands({ initialSearch = '' }: GitCommandsProps) {
                     Category
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2">
-                    {categories.map(category => {
+                    {commandCategories.map(category => {
                       const IconComponent = category.icon;
                       return (
                         <Button

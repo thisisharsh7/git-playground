@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { GitCommands } from '@/components/git-commands'
+import { GitCommands, commandCategories } from '@/components/git-commands'
+import { GitExplainer } from '@/lib/git-explainer'
 
 const SEARCH = 'Search commands, descriptions, or use cases...'
 
@@ -14,6 +15,38 @@ function openReference() {
   fireEvent.focus(screen.getByRole('tab', { name: /Command Reference/ }))
   return screen.getByPlaceholderText(SEARCH) as HTMLInputElement
 }
+
+describe('category icons (D2.14)', () => {
+  // Below the sm breakpoint the labels are hidden, so a repeated icon leaves
+  // two filters indistinguishable. remote/collaboration both used Users and
+  // advanced/maintenance both used Settings.
+  it('gives every category its own icon', () => {
+    const icons = commandCategories.map((category) => category.icon)
+    expect(new Set(icons).size).toBe(icons.length)
+  })
+
+  it('covers every category the command data actually uses', () => {
+    const declared = new Set(commandCategories.map((category) => category.id))
+    for (const command of GitExplainer.getAllCommands()) {
+      expect(declared.has(command.category), command.command).toBe(true)
+    }
+  })
+
+  // 'All' and 'Advanced' are also difficulty labels, so this uses a category
+  // label that is unique on the page to prove the hoisted array stays wired up.
+  it('filters the list when a category is selected', () => {
+    render(<GitCommands />)
+    openReference()
+
+    expect(screen.getByText('git gc')).toBeInTheDocument()
+    expect(screen.getByText('git rebase')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Maintenance' }))
+
+    expect(screen.getByText('git gc')).toBeInTheDocument()
+    expect(screen.queryByText('git rebase')).not.toBeInTheDocument()
+  })
+})
 
 describe('command reference search (D2.1)', () => {
   it('keeps every typed character', () => {
