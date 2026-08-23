@@ -240,22 +240,41 @@ describe('pinned defects', () => {
     })
   })
 
-  describe('D1.4 and D1.5 flags are treated as branch names', () => {
-    it('pins: git checkout -b is rejected instead of creating a branch', async () => {
-      await type('git checkout -b feature')
-      expect(out()).toContain(
-        "error: pathspec '-b' did not match any file(s) known to git",
-      )
-    })
-
-    it('pins: git branch -d creates a branch literally named -d', async () => {
-      await type('git branch -d feature')
-      expect(out()).toContain("Created branch '-d'")
-    })
-
-    it.fails('git checkout -b should create and switch to the branch', async () => {
+  // FIXED in Phase 4A. Flags are no longer read as branch names.
+  describe('D1.4 and D1.5 flag parsing', () => {
+    it('git checkout -b creates and switches to the branch', async () => {
       await type('git checkout -b feature')
       expect(out()).toContain("Switched to a new branch 'feature'")
+      expect(screen.getByText('★ feature')).toBeInTheDocument()
+    })
+
+    it('git checkout -b onto an existing branch is refused', async () => {
+      await quick('New Branch')
+      await type('git checkout -b feature')
+      expect(out()).toContain("fatal: a branch named 'feature' already exists")
+    })
+
+    it('git branch -d deletes a branch', async () => {
+      await quick('New Branch')
+      await type('git branch -d feature')
+      expect(out()).toContain('Deleted branch feature (was a1b2c3d).')
+      expect(screen.queryByText('feature')).not.toBeInTheDocument()
+    })
+
+    it('git branch -d of a missing branch is refused', async () => {
+      await type('git branch -d nope')
+      expect(out()).toContain("error: branch 'nope' not found.")
+    })
+
+    it('git branch -d of the checked-out branch is refused', async () => {
+      await type('git branch -d main')
+      expect(out()).toContain("error: Cannot delete branch 'main' checked out at")
+    })
+
+    it('an unrecognised flag is reported as a switch, not created as a branch', async () => {
+      await type('git branch -a')
+      expect(out()).toContain('error: unknown switch')
+      expect(out()).not.toContain("Created branch '-a'")
     })
   })
 

@@ -162,13 +162,36 @@ export function executeGitCommand(
         success = false;
       }
       break;
-    case 'branch':
-      if (parts[2]) {
-        if (!newGitState.branches.includes(parts[2])) {
-          newGitState.branches.push(parts[2]);
-          output = `Created branch '${parts[2]}'`;
+    case 'branch': {
+      const arg = parts[2];
+      if (arg === '-d' || arg === '-D') {
+        const target = parts[3];
+        if (!target) {
+          output = 'fatal: branch name required';
+          success = false;
+        } else if (!newGitState.branches.includes(target)) {
+          output = `error: branch '${target}' not found.`;
+          success = false;
+        } else if (target === newGitState.currentBranch) {
+          output = `error: Cannot delete branch '${target}' checked out at '/project'`;
+          success = false;
         } else {
-          output = `fatal: A branch named '${parts[2]}' already exists.`;
+          const tip = [...newGitState.commits].reverse()
+            .find(c => c.branch === target) ?? newGitState.commits[newGitState.commits.length - 1];
+          newGitState.branches = newGitState.branches.filter(b => b !== target);
+          output = `Deleted branch ${target} (was ${tip.id}).`;
+        }
+      } else if (arg && arg.startsWith('-')) {
+        // Previously any flag became a branch name, so `git branch -d x`
+        // created a branch called '-d' (D1.5).
+        output = `error: unknown switch \`${arg}'`;
+        success = false;
+      } else if (arg) {
+        if (!newGitState.branches.includes(arg)) {
+          newGitState.branches.push(arg);
+          output = `Created branch '${arg}'`;
+        } else {
+          output = `fatal: A branch named '${arg}' already exists.`;
           success = false;
         }
       } else {
@@ -177,15 +200,36 @@ export function executeGitCommand(
         ).join('\n');
       }
       break;
-    case 'checkout':
-      if (parts[2] && newGitState.branches.includes(parts[2])) {
-        newGitState.currentBranch = parts[2];
-        output = `Switched to branch '${parts[2]}'`;
-      } else if (parts[2]) {
-        output = `error: pathspec '${parts[2]}' did not match any file(s) known to git`;
+    }
+    case 'checkout': {
+      const arg = parts[2];
+      if (arg === '-b') {
+        // Previously '-b' was looked up as a branch name, so the most common
+        // branching command always failed (D1.4).
+        const target = parts[3];
+        if (!target) {
+          output = 'fatal: branch name required';
+          success = false;
+        } else if (newGitState.branches.includes(target)) {
+          output = `fatal: a branch named '${target}' already exists`;
+          success = false;
+        } else {
+          newGitState.branches.push(target);
+          newGitState.currentBranch = target;
+          output = `Switched to a new branch '${target}'`;
+        }
+      } else if (arg && arg.startsWith('-')) {
+        output = `error: unknown switch \`${arg}'`;
+        success = false;
+      } else if (arg && newGitState.branches.includes(arg)) {
+        newGitState.currentBranch = arg;
+        output = `Switched to branch '${arg}'`;
+      } else if (arg) {
+        output = `error: pathspec '${arg}' did not match any file(s) known to git`;
         success = false;
       }
       break;
+    }
     case 'log':
       output = newGitState.commits
         .filter(c => c.branch === newGitState.currentBranch)
