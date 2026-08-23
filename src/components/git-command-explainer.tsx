@@ -25,6 +25,9 @@ export function GitCommandExplainer() {
     if (!query.trim()) {
       setExplanation(null);
       setSuggestions([]);
+      // Clearing the input mid-debounce used to leave the spinner running
+      // forever, because this branch returned without resetting it (D2.4).
+      setIsSearching(false);
       return;
     }
 
