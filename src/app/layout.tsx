@@ -29,13 +29,27 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Enhanced structured data for SEO - emphasizing interactive playground
+  // One honest site-level entity.
+  //
+  // Removed in Phase 5:
+  //  - aggregateRating (4.8 from 150 ratings) — invented; there is no rating
+  //    system, no reviews and no users anywhere in this codebase.
+  //  - the Organization block — "Git Master" is not a real organization, and
+  //    its foundingDate/areaServed/serviceType were all invented. Its logo
+  //    pointed at a favicon, which Google rejects, so it could never have
+  //    produced a rich result.
+  //  - a second, duplicate SoftwareApplication describing the same product as
+  //    a different @type with no linkage between them.
+  //  - creator/publisher Organizations, screenshot (a favicon), softwareVersion
+  //    (1.0.0 while package.json says 0.1.0), and dateModified (evaluated at
+  //    build time, so it perpetually claimed "modified today").
+  //
+  // datePublished is the repository's real first commit.
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Git Master",
-    "alternateName": "Git Master Interactive Platform",
-    "description": "Interactive Git playground and command simulator. Practice Git version control in a safe environment with real-time visualization and hands-on learning tools.",
+    "description": "Interactive Git playground and command simulator. Practice Git commands in a safe environment that never touches a real repository.",
     "url": baseUrl,
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Web Browser",
@@ -44,106 +58,20 @@ export default function RootLayout({
       "price": "0",
       "priceCurrency": "USD"
     },
-    "creator": {
-      "@type": "Organization",
-      "name": "Git Master",
-      "description": "Interactive platform for Git version control practice and learning"
-    },
-    "publisher": {
-      "@type": "Organization", 
-      "name": "Git Master",
-      "description": "Developer tools platform specializing in Git simulation and practice environments"
-    },
-    "applicationSubCategory": "Version Control Simulator",
     "browserRequirements": "Requires JavaScript. Requires HTML5.",
-    "softwareVersion": "1.0.0",
-    "datePublished": "2024-01-01",
-    "dateModified": new Date().toISOString().split('T')[0],
+    "datePublished": "2025-07-04",
     "inLanguage": "en-US",
     "isAccessibleForFree": true,
-    "keywords": "git playground, git simulator, interactive git, version control practice, git visualization, developer tools",
+    // Only what the product actually does. The previous list claimed "branch
+    // and merge visualization" with no merge implemented, and "real-time
+    // repository state visualization" for a hardcoded diagram.
     "featureList": [
       "Interactive Git command terminal",
-      "Real-time repository state visualization",
-      "Git workflow simulation",
-      "Branch and merge visualization",
-      "Command reference library",
-      "Safe practice environment",
-      "Visual learning diagrams"
+      "Repository state display",
+      "Structured Git lessons with quizzes",
+      "Git command reference",
+      "Git workflow diagrams"
     ],
-    "screenshot": `${baseUrl}/favicon.svg`,
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "150",
-      "bestRating": "5"
-    },
-    "audience": {
-      "@type": "Audience",
-      "audienceType": "software developers, programming students, version control learners"
-    }
-  };
-
-  // Organization structured data
-  const organizationData = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Git Master",
-    "alternateName": "Git Master Platform",
-    "description": "Leading interactive platform for Git education and version control learning",
-    "url": baseUrl,
-    "logo": `${baseUrl}/favicon.svg`,
-    "foundingDate": "2024",
-    "knowsAbout": [
-      "Git version control",
-      "Software development",
-      "Developer education",
-      "Interactive learning",
-      "Version control systems"
-    ],
-    "areaServed": "Worldwide",
-    "serviceType": "Educational Technology"
-  };
-
-  // Interactive playground/tool structured data
-  const playgroundData = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Git Master Interactive Playground",
-    "description": "Interactive Git command playground and practice environment. Simulate Git operations, visualize repository states, and practice version control in a safe sandbox environment.",
-    "applicationCategory": "DeveloperApplication",
-    "applicationSubCategory": "Version Control Tool",
-    "operatingSystem": "Web Browser",
-    "url": `${baseUrl}/git-playground`,
-    "isAccessibleForFree": true,
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "creator": {
-      "@type": "Organization",
-      "name": "Git Master",
-      "url": baseUrl
-    },
-    "softwareVersion": "1.0.0",
-    "datePublished": "2024-01-01",
-    "dateModified": new Date().toISOString().split('T')[0],
-    "browserRequirements": "Requires JavaScript. Requires HTML5.",
-    "featureList": [
-      "Interactive Git command terminal",
-      "Real-time repository visualization", 
-      "Git command simulation",
-      "Branch and commit tree display",
-      "Safe practice environment",
-      "Command history tracking",
-      "Visual workflow diagrams"
-    ],
-    "keywords": "git playground, git simulator, git practice, version control sandbox, interactive git, git visualization",
-    "audience": {
-      "@type": "Audience",
-      "audienceType": "developers, programmers, students learning git"
-    },
     "usageInfo": "Practice Git commands in a simulated environment without affecting real repositories"
   };
 
@@ -160,18 +88,6 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(structuredData),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationData),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(playgroundData),
           }}
         />
         

@@ -88,7 +88,7 @@ export function GitCommandExplainer() {
             Git Command Explainer
           </CardTitle>
           <CardDescription className="text-sm sm:text-base">
-            Get instant, AI-like explanations for any Git command. Just type and learn!
+            Get instant explanations for any of the 25 documented Git commands. Just type and learn!
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -240,7 +240,7 @@ export function GitCommandExplainer() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="h-5 w-5 text-yellow-500" />
-              Git Tip of the Day
+              Random Git Tip
             </CardTitle>
           </CardHeader>
           <CardContent>

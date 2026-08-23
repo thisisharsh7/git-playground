@@ -72,9 +72,8 @@ export const baseMetadata: Metadata = {
   verification: {
     google: "309dfde5f79964cc",
   },
-  authors: [{ name: brandConfig.author }],
-  creator: brandConfig.company,
-  publisher: brandConfig.company,
+  // `authors: [{ name: 'Git Master Team' }]` removed in Phase 5: there is no
+  // such team, and it was emitted as <meta name="author"> on every page.
   applicationName: brandConfig.name,
   category: "Education",
   classification: "Educational Software",
@@ -132,13 +131,13 @@ export function generatePageMetadata({
       siteName: brandConfig.name,
       type: "website",
       locale: "en_US",
+      // The declared 1200x630 was false: this points at favicon.svg. The
+      // dimensions and type are dropped rather than restated, since no real
+      // Open Graph image asset exists yet.
       images: [
         {
           url: imageUrl,
-          width: 1200,
-          height: 630,
           alt: `${title} - ${brandConfig.name}`,
-          type: "image/svg+xml",
         },
       ],
     },

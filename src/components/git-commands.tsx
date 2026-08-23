@@ -105,7 +105,7 @@ export function GitCommands({ initialSearch = '' }: GitCommandsProps) {
             Git Command Reference
           </h1>
           <p className="text-base sm:text-lg lg:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto px-4">
-            Comprehensive guide to Git commands with AI-powered explanations and interactive examples
+            Comprehensive guide to Git commands with detailed explanations and worked examples
           </p>
         </div>
 
@@ -117,8 +117,8 @@ export function GitCommands({ initialSearch = '' }: GitCommandsProps) {
                 className="flex items-center justify-center gap-2 sm:gap-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white dark:data-[state=active]:text-white transition-all duration-300 text-sm sm:text-base font-medium px-2 sm:px-4"
               >
                 <Zap className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                <span className="hidden xs:inline">AI Command Explainer</span>
-                <span className="xs:hidden">AI Explainer</span>
+                <span className="hidden xs:inline">Command Explainer</span>
+                <span className="xs:hidden">Explainer</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="reference" 

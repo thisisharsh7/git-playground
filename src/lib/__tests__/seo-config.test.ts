@@ -47,6 +47,19 @@ describe('homepage metadata is frozen', () => {
   it('openGraph url matches the canonical', () => {
     expect(home.openGraph).toMatchObject({ url: 'https://my-git-playground.vercel.app' })
   })
+
+  // Phase 5: 'Git Master Team' is not a real team and was emitted as
+  // <meta name="author"> on every page.
+  it('declares no fabricated author', () => {
+    expect(home.authors).toBeUndefined()
+  })
+
+  // The OG image points at favicon.svg; it must not claim to be 1200x630.
+  it('makes no false claim about the Open Graph image', () => {
+    const images = home.openGraph?.images as Array<Record<string, unknown>>
+    expect(images[0].width).toBeUndefined()
+    expect(images[0].height).toBeUndefined()
+  })
 })
 
 describe('playground metadata', () => {

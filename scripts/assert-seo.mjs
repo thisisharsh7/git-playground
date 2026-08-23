@@ -70,8 +70,10 @@ for (const page of PAGES) {
   // here, because the JSON-LD is also inlined in the RSC flight payload via
   // self.__next_f.push(...). Counting opening tags gives the real 3.
   const blocks = [...html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
-  if (blocks.length !== 3) {
-    fail(`${page.file}: expected 3 JSON-LD blocks, found ${blocks.length}`)
+  // Was 3 before Phase 5 removed the fabricated Organization block and the
+  // duplicate SoftwareApplication entity.
+  if (blocks.length !== 1) {
+    fail(`${page.file}: expected 1 JSON-LD block, found ${blocks.length}`)
   }
   for (const [index, block] of blocks.entries()) {
     try {
@@ -94,6 +96,17 @@ for (const page of PAGES) {
     if (!html.includes(needle)) {
       fail(`${page.file}: missing required copy "${needle}"`)
     }
+  }
+
+  // Fabrications removed in Phase 5 must never come back.
+  for (const banned of ['aggregateRating', '"@type":"Organization"', 'Git Master Team']) {
+    if (html.includes(banned)) {
+      fail(`${page.file}: contains removed fabrication "${banned}"`)
+    }
+  }
+  // dateModified was `new Date()`, so it always claimed "modified today".
+  if (/"dateModified"/.test(html)) {
+    fail(`${page.file}: dateModified is self-invalidating and was removed`)
   }
 }
 
