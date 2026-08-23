@@ -46,6 +46,46 @@ describe('lesson deep link (D1.13)', () => {
   })
 })
 
+describe('overall progress (D2.6)', () => {
+  it('reports 0 of 4 with no progress stored', () => {
+    render(<GitLessons />)
+    expect(screen.getByText('0%')).toBeInTheDocument()
+    expect(screen.getByText(/0 of 4 lessons completed/)).toBeInTheDocument()
+  })
+
+  it('counts one passed lesson out of four as 25%', () => {
+    seed([passed('git-basics')])
+    render(<GitLessons />)
+    expect(screen.getByText('25%')).toBeInTheDocument()
+    expect(screen.getByText(/1 of 4 lessons completed/)).toBeInTheDocument()
+  })
+
+  it('never exceeds 100% or 4 of 4 when stale entries are stored', () => {
+    // Six passed entries, two of which are not real lessons any more.
+    // quizScore 80 so the per-lesson badges do not collide with the 100%
+    // overall-progress figure this test is asserting on.
+    seed([
+      passed('git-basics', 80),
+      passed('branching', 80),
+      passed('remote-repos', 80),
+      passed('advanced-git', 80),
+      passed('retired-lesson-1', 80),
+      passed('retired-lesson-2', 80),
+    ])
+    render(<GitLessons />)
+    expect(screen.getByText('100%')).toBeInTheDocument()
+    // Previously this read "6 of 4 lessons completed".
+    expect(screen.getByText(/4 of 4 lessons completed/)).toBeInTheDocument()
+  })
+
+  it('ignores duplicated entries for the same lesson', () => {
+    seed([passed('git-basics'), passed('git-basics'), passed('git-basics')])
+    render(<GitLessons />)
+    expect(screen.getByText('25%')).toBeInTheDocument()
+    expect(screen.getByText(/1 of 4 lessons completed/)).toBeInTheDocument()
+  })
+})
+
 describe('score rendering (D2.5)', () => {
   it('shows a badge for a legitimate score of 0 instead of a stray "0"', () => {
     seed([

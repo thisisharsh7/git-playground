@@ -196,9 +196,19 @@ export function GitLessons({ initialLessonId = '' }: GitLessonsProps = {}) {
     setSelectedLesson(null);
   };
 
+  // Counted against the known lesson ids, not the raw stored array. Stale or
+  // duplicated entries in localStorage could otherwise report more completed
+  // lessons than exist, and push the percentage past 100% (D2.6).
+  const getCompletedLessonCount = () => {
+    const passedIds = new Set(
+      progress.filter(p => p.quizPassed).map(p => p.lessonId)
+    );
+    return lessons.filter(lesson => passedIds.has(lesson.id)).length;
+  };
+
   const getOverallProgress = () => {
-    const completedLessons = progress.filter(p => p.quizPassed).length;
-    return Math.round((completedLessons / lessons.length) * 100);
+    const percentage = Math.round((getCompletedLessonCount() / lessons.length) * 100);
+    return Math.min(100, Math.max(0, percentage));
   };
 
   // Show quiz if in quiz mode
@@ -358,7 +368,7 @@ export function GitLessons({ initialLessonId = '' }: GitLessonsProps = {}) {
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Overall Progress</span>
               <span className="text-sm text-slate-600 dark:text-slate-400">
-                {progress.filter(p => p.quizPassed).length} of {lessons.length} lessons completed
+                {getCompletedLessonCount()} of {lessons.length} lessons completed
               </span>
             </div>
             <Progress value={getOverallProgress()} className="h-3" />
