@@ -63,20 +63,24 @@ export function QuizComponent({ quiz, onComplete, onBack }: QuizProps) {
     onComplete(passed, finalScore);
   }, [quiz, answers, onComplete]);
 
-  // Timer effect
+  // Timer effect. The updater only computes the next value — calling
+  // handleSubmitQuiz() from inside it made the updater impure, and React 19
+  // double-invokes updaters in development, so onComplete (and the parent's
+  // localStorage write) could fire twice (D2.2).
   useEffect(() => {
     if (quizStarted && timeLeft !== null && timeLeft > 0 && !showResults) {
       const timer = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev && prev <= 1) {
-            handleSubmitQuiz();
-            return 0;
-          }
-          return prev ? prev - 1 : null;
-        });
+        setTimeLeft(prev => (prev && prev > 0 ? prev - 1 : 0));
       }, 1000);
 
       return () => clearInterval(timer);
+    }
+  }, [quizStarted, timeLeft, showResults]);
+
+  // Submitting on expiry belongs in an effect, not in the updater.
+  useEffect(() => {
+    if (quizStarted && timeLeft === 0 && !showResults) {
+      handleSubmitQuiz();
     }
   }, [quizStarted, timeLeft, showResults, handleSubmitQuiz]);
 
