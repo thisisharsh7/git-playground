@@ -433,23 +433,50 @@ Object.entries(gitCommandExplanations).forEach(([key, value]) => {
 });
 
 export class GitExplainer {
+  /**
+   * Resolves a command to its documentation.
+   *
+   * Lookup used to be exact-match only, so anything a user actually types —
+   * `git rebase -i`, `git add .`, `git checkout -b feature` — resolved to
+   * nothing (D2.13). Now the longest matching leading token sequence wins, so
+   * flags and arguments are ignored while the command itself still has to be
+   * documented. Nothing is invented: an undocumented command still returns null.
+   */
   static explain(command: string): GitCommandExplanation | null {
     const normalizedCommand = command.toLowerCase().trim();
-    
+    if (!normalizedCommand) return null;
+
     // Try exact match first
     let explanation = explanationCache.get(normalizedCommand);
-    
+
     // Try with 'git ' prefix if not found
     if (!explanation && !normalizedCommand.startsWith('git ')) {
       explanation = explanationCache.get(`git ${normalizedCommand}`);
     }
-    
+
     // Try without 'git ' prefix if not found
     if (!explanation && normalizedCommand.startsWith('git ')) {
       explanation = explanationCache.get(normalizedCommand.replace('git ', ''));
     }
-    
-    return explanation || null;
+
+    if (explanation) return explanation;
+
+    // Longest-prefix fallback: drop trailing tokens until a documented command
+    // is left. Stops at two tokens for a `git <verb>` form, or one otherwise,
+    // so a bare 'git' can never resolve to an arbitrary entry.
+    const tokens = normalizedCommand.split(/\s+/);
+    const floor = tokens[0] === 'git' ? 2 : 1;
+    for (let end = tokens.length - 1; end >= floor; end--) {
+      const candidate = tokens.slice(0, end).join(' ');
+      const match =
+        explanationCache.get(candidate) ??
+        (candidate.startsWith('git ')
+          ? undefined
+          : explanationCache.get(`git ${candidate}`));
+      if (match) return match;
+    }
+
+    return null;
   }
 
   static getCommandsByCategory(category: GitCommandExplanation['category']): GitCommandExplanation[] {

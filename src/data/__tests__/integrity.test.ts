@@ -156,13 +156,13 @@ describe('quiz scoring thresholds', () => {
 })
 
 describe('lesson commands resolve in the reference', () => {
-  // Pinned gap: 'git branch -d' is advertised by the branching lesson but the
-  // explainer is exact-match only, so it cannot resolve. Asserting the exact
-  // list means any NEW gap fails the build. Phase 4 closes this one.
-  it('only git branch -d is unresolvable', () => {
+  // Previously 'git branch -d' could not resolve, because lookup was
+  // exact-match only. Phase 4D's longest-prefix matching closed that gap, so
+  // every command a lesson advertises now has documentation behind it.
+  it('every advertised lesson command resolves', () => {
     const unresolvable = lessons
       .flatMap((lesson) => lesson.commands)
       .filter((command) => !GitExplainer.explain(command))
-    expect(unresolvable).toEqual(['git branch -d'])
+    expect(unresolvable).toEqual([])
   })
 })

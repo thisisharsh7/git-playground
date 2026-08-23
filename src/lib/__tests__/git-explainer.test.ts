@@ -79,18 +79,36 @@ describe('explain', () => {
     expect(GitExplainer.explain('git nonexistent')).toBeNull()
   })
 
-  // Pinned product hole (D2.13, fixed in Phase 4 with longest-prefix matching).
-  // Lookup is exact-match, so any real command with a flag or argument fails —
-  // which is what users actually type into the "explainer".
+  // FIXED in Phase 4D. Real commands carry flags and arguments; the longest
+  // documented leading token sequence now wins.
   it.each([
-    'git rebase -i',
-    'git add .',
-    'git commit -m "x"',
-    'git checkout -b feature',
-    'git log --oneline',
-    'git branch -d',
-  ])('currently fails to resolve %p', (input) => {
-    expect(GitExplainer.explain(input)).toBeNull()
+    ['git rebase -i', 'git rebase'],
+    ['git add .', 'git add'],
+    ['git commit -m "x"', 'git commit'],
+    ['git checkout -b feature', 'git checkout'],
+    ['git log --oneline --graph', 'git log'],
+    ['git branch -d old-thing', 'git branch'],
+    ['git stash pop', 'git stash'],
+    ['git reset --hard HEAD~1', 'git reset'],
+  ])('resolves %p to %p', (input, expected) => {
+    expect(GitExplainer.explain(input)?.command).toBe(expected)
+  })
+
+  it('resolves flagged forms without the git prefix too', () => {
+    expect(GitExplainer.explain('rebase -i')?.command).toBe('git rebase')
+  })
+
+  // The fallback must not invent an answer for something undocumented.
+  it.each(['git', 'git ', 'git nonexistent', 'git nonexistent --flag', 'nonexistent', ''])(
+    'still returns null for %p',
+    (input) => {
+      expect(GitExplainer.explain(input)).toBeNull()
+    },
+  )
+
+  it('prefers the most specific documented match', () => {
+    // 'git switch' is documented in its own right, not as a flag on checkout.
+    expect(GitExplainer.explain('git switch -c feature')?.command).toBe('git switch')
   })
 })
 
