@@ -14,7 +14,18 @@ import { QuickCommands } from '@/components/playground/quick-commands';
  * component prerender into static HTML — exactly what /git-playground lost by
  * putting useSearchParams inside its Suspense boundary. Enforced by a test.
  */
-export function GitPlayground() {
+/**
+ * Heading level for the playground's card titles. The component sits under an
+ * `h1` on /git-playground and will sit under an `h2` on the homepage, so the
+ * level has to move with it or the document skips a level.
+ */
+export type HeadingLevel = 2 | 3;
+
+interface GitPlaygroundProps {
+  headingLevel?: HeadingLevel;
+}
+
+export function GitPlayground({ headingLevel = 2 }: GitPlaygroundProps = {}) {
   const {
     gitState,
     commandHistory,
@@ -46,11 +57,20 @@ export function GitPlayground() {
           terminalRef={terminalRef}
           onCommandChange={setCommand}
           onExecute={() => runCommand(command)}
+          headingLevel={headingLevel}
         />
-        <RepositoryState state={gitState} formatTimestamp={formatTimestamp} />
+        <RepositoryState
+          state={gitState}
+          formatTimestamp={formatTimestamp}
+          headingLevel={headingLevel}
+        />
       </div>
 
-      <QuickCommands onExecute={runCommand} disabled={isTyping} />
+      <QuickCommands
+        onExecute={runCommand}
+        disabled={isTyping}
+        headingLevel={headingLevel}
+      />
     </>
   );
 }

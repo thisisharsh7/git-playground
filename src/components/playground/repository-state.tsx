@@ -4,21 +4,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { GitBranch, FileText, Clock, CheckCircle } from 'lucide-react';
 import type { GitState } from '@/lib/git-engine';
+import type { HeadingLevel } from '@/components/playground/git-playground';
 
 interface RepositoryStateProps {
   state: GitState;
   formatTimestamp: (timestamp: string) => string;
+  headingLevel?: HeadingLevel;
 }
 
 // Markup moved verbatim from git-playground/page.tsx:471-573.
-export function RepositoryState({ state, formatTimestamp }: RepositoryStateProps) {
+export function RepositoryState({ state, formatTimestamp, headingLevel = 2 }: RepositoryStateProps) {
+  const Heading = `h${headingLevel}` as const;
+  const SubHeading = `h${headingLevel + 1}` as 'h3' | 'h4';
+
   return (
     <Card className="overflow-hidden border-0 shadow-2xl bg-white/50 dark:bg-slate-900/50  py-0 backdrop-blur-sm">
       <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4">
         <div className="flex items-center gap-3">
           <GitBranch className="w-6 h-6" />
           <div>
-            <CardTitle className="text-lg font-bold">Repository State</CardTitle>
+            <CardTitle className="text-lg font-bold"><Heading>Repository State</Heading></CardTitle>
             <CardDescription className="text-purple-100">
               Live visualization of your Git repository
             </CardDescription>
@@ -32,7 +37,7 @@ export function RepositoryState({ state, formatTimestamp }: RepositoryStateProps
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <GitBranch className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            <h3 className="font-semibold text-slate-900 dark:text-slate-100">Current Branch</h3>
+            <SubHeading className="font-semibold text-slate-900 dark:text-slate-100">Current Branch</SubHeading>
           </div>
           <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 text-sm font-medium shadow-lg">
             {state.currentBranch}
@@ -43,7 +48,7 @@ export function RepositoryState({ state, formatTimestamp }: RepositoryStateProps
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <GitBranch className="w-4 h-4 text-green-600 dark:text-green-400" />
-            <h3 className="font-semibold text-slate-900 dark:text-slate-100">All Branches</h3>
+            <SubHeading className="font-semibold text-slate-900 dark:text-slate-100">All Branches</SubHeading>
           </div>
           <div className="flex flex-wrap gap-2">
             {state.branches.map(branch => (
@@ -65,7 +70,7 @@ export function RepositoryState({ state, formatTimestamp }: RepositoryStateProps
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <FileText className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-            <h3 className="font-semibold text-slate-900 dark:text-slate-100">Working Directory</h3>
+            <SubHeading className="font-semibold text-slate-900 dark:text-slate-100">Working Directory</SubHeading>
           </div>
           <div className="space-y-2">
             {state.workingDirectory.map(file => (
@@ -89,7 +94,7 @@ export function RepositoryState({ state, formatTimestamp }: RepositoryStateProps
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-            <h3 className="font-semibold text-slate-900 dark:text-slate-100">Recent Commits</h3>
+            <SubHeading className="font-semibold text-slate-900 dark:text-slate-100">Recent Commits</SubHeading>
           </div>
           <div className="space-y-3">
             {state.commits.slice(-3).reverse().map((commit, index) => (

@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect, useId, useRef, type RefObject } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Terminal, Play } from 'lucide-react';
 import type { CommandHistory } from '@/lib/git-engine';
+import type { HeadingLevel } from '@/components/playground/git-playground';
 
 interface GitTerminalProps {
   history: CommandHistory[];
@@ -16,6 +18,7 @@ interface GitTerminalProps {
   terminalRef: RefObject<HTMLDivElement | null>;
   onCommandChange: (value: string) => void;
   onExecute: () => void;
+  headingLevel?: HeadingLevel;
 }
 
 // Markup moved verbatim from git-playground/page.tsx:374-468. The deprecated
@@ -29,9 +32,13 @@ export function GitTerminal({
   terminalRef,
   onCommandChange,
   onExecute,
+  headingLevel = 2,
 }: GitTerminalProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const wasTyping = useRef(false);
+  // Unique so a second playground instance cannot collide on the label's `for`.
+  const inputId = useId();
+  const Heading = `h${headingLevel}` as const;
 
   // Return focus to the prompt once a command finishes, so a click on a quick
   // command does not leave focus stranded on the button (D1.14).
@@ -47,14 +54,17 @@ export function GitTerminal({
       <CardHeader className="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2" aria-hidden="true">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
               <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
               <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
             </div>
             <Terminal className="w-5 h-5 text-green-400" />
             <CardTitle className="text-lg font-bold text-green-400">
-              git-playground
+              {/* A real heading, so the terminal is reachable by heading
+                  navigation. Tailwind's preflight makes headings inherit their
+                  size, so this changes nothing visually. */}
+              <Heading>git-playground</Heading>
             </CardTitle>
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-400">
@@ -65,8 +75,15 @@ export function GitTerminal({
       </CardHeader>
 
       <CardContent className="p-0">
+        {/* role="log" + aria-live so command output is announced, and
+            tabIndex so the scrollable transcript is reachable by keyboard.
+            Previously it was an unlabelled, unfocusable div. */}
         <div
           ref={terminalRef}
+          role="log"
+          aria-live="polite"
+          aria-label="Terminal output"
+          tabIndex={0}
           className="h-96 bg-slate-900 text-green-400 p-4 font-mono text-sm overflow-y-auto scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800"
         >
           {history.map((cmd, index) => (
@@ -98,7 +115,7 @@ export function GitTerminal({
               <span className="text-yellow-400 animate-pulse font-medium">Processing...</span>
             )}
             {isClient && !isTyping && (
-              <span className="w-2 h-4 bg-green-400 animate-pulse ml-1"></span>
+              <span className="w-2 h-4 bg-green-400 animate-pulse ml-1" aria-hidden="true"></span>
             )}
           </div>
         </div>
@@ -106,17 +123,27 @@ export function GitTerminal({
         {/* Command Input */}
         <div className="p-4 bg-slate-800 border-t border-slate-700">
           <div className="flex gap-3">
-            <div className="flex items-center gap-2 text-green-400 font-mono text-sm font-bold">
+            <div className="flex items-center gap-2 text-green-400 font-mono text-sm font-bold" aria-hidden="true">
               <span>$</span>
             </div>
+            {/* The input had no accessible name at all — only a placeholder,
+                which assistive technology may not announce. */}
+            <Label htmlFor={inputId} className="sr-only">
+              Git command
+            </Label>
             {/* Deliberately not disabled while a command runs: disabling blurs
                 the element and dropped focus to <body> after every command
-                (D1.14). Enter is still ignored mid-command. */}
+                (D1.14). Enter is still ignored mid-command. onKeyDown rather
+                than the deprecated onKeyPress, which does not fire reliably
+                for all keys. */}
             <Input
               ref={inputRef}
+              id={inputId}
               value={command}
               onChange={(e) => onCommandChange(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !isTyping && onExecute()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !isTyping) onExecute();
+              }}
               placeholder="Type your Git command here..."
               className="font-mono bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400/20"
             />

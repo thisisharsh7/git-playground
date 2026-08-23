@@ -5,21 +5,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Command, BarChart3, GitBranch, CheckCircle, Clock } from 'lucide-react';
 
+import type { HeadingLevel } from '@/components/playground/git-playground';
+
 interface QuickCommandsProps {
   onExecute: (command: string) => void;
   disabled: boolean;
+  headingLevel?: HeadingLevel;
 }
 
 // Markup and command list moved verbatim from git-playground/page.tsx:577-637.
 // Note `git checkout feature` fails unless `git branch feature` ran first.
-export function QuickCommands({ onExecute, disabled }: QuickCommandsProps) {
+export function QuickCommands({ onExecute, disabled, headingLevel = 2 }: QuickCommandsProps) {
+  const Heading = `h${headingLevel}` as const;
+
   return (
     <Card className="overflow-hidden border-0 shadow-2xl bg-white/50 dark:bg-slate-900/50 pt-0 backdrop-blur-sm">
       <CardHeader className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white p-4">
         <div className="flex items-center gap-3">
           <Command className="w-6 h-6" />
           <div>
-            <CardTitle className="text-lg font-bold">Quick Commands</CardTitle>
+            <CardTitle className="text-lg font-bold"><Heading>Quick Commands</Heading></CardTitle>
             <CardDescription className="text-cyan-100">
               Click to execute common Git commands instantly
             </CardDescription>
