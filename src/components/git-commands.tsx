@@ -19,12 +19,11 @@ export function GitCommands({ initialSearch = '' }: GitCommandsProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
 
-  // Update search query when initialSearch prop changes
+  // Sync only when the prop itself changes. Depending on searchQuery here made
+  // every keystroke re-run this effect and reset the input (D2.1).
   useEffect(() => {
-    if (initialSearch !== searchQuery) {
-      setSearchQuery(initialSearch);
-    }
-  }, [initialSearch, searchQuery]);
+    setSearchQuery(initialSearch);
+  }, [initialSearch]);
 
   const allCommands = GitExplainer.getAllCommands();
   
