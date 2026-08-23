@@ -124,6 +124,20 @@ export function executeGitCommand(
   const parts = trimmedCmd.split(' ');
   const gitCommand = parts[1];
 
+  // Bare `git` used to fall through to the default branch, which interpolated
+  // the undefined subcommand and printed "git: 'undefined' is not a git
+  // command." (D1.6). Matched on the whole input, not on a falsy parts[1], so
+  // that `git  status` still reports an empty subcommand (D1.11, unfixed).
+  if (trimmedCmd === 'git') {
+    return {
+      state: newGitState,
+      output:
+        'usage: git <command> [<args>]\n\n' +
+        'Supported commands: add, branch, checkout, commit, log, remote, status',
+      success: false,
+    };
+  }
+
   switch (gitCommand) {
     case 'status':
       output = generateStatusOutput(newGitState);

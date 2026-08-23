@@ -228,15 +228,17 @@ describe('pinned defects', () => {
     })
   })
 
-  describe('D1.6 bare git interpolates undefined', () => {
-    it('pins: the literal string undefined is shown to the user', async () => {
+  // FIXED in Phase 4A.
+  describe('D1.6 bare git', () => {
+    it('prints usage instead of the literal string undefined', async () => {
       await type('git')
-      expect(out()).toContain("git: 'undefined' is not a git command.")
+      expect(out()).toContain('usage: git <command> [<args>]')
+      expect(out()).not.toContain('undefined')
     })
 
-    it.fails('bare git should print usage, not undefined', async () => {
+    it('lists the commands the simulator actually supports', async () => {
       await type('git')
-      expect(out()).not.toContain('undefined')
+      expect(out()).toContain('add, branch, checkout, commit, log, remote, status')
     })
   })
 
