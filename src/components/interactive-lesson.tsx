@@ -35,7 +35,8 @@ interface InteractiveLessonProps {
   onBack: () => void;
 }
 
-const lessonContent: Record<string, LessonStep[]> = {
+// Exported for data-integrity tests.
+export const lessonContent: Record<string, LessonStep[]> = {
   'git-basics': [
     {
       id: 1,

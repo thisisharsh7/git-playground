@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "verify:seo": "node scripts/assert-seo.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",

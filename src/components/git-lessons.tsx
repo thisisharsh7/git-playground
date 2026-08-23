@@ -29,7 +29,9 @@ interface LessonProgress {
   quizPassed: boolean;
 }
 
-const lessons: Lesson[] = [
+// Exported for data-integrity tests; order is a behavioural contract
+// because isLessonUnlocked() gates on array position.
+export const lessons: Lesson[] = [
   {
     id: 'git-basics',
     title: 'Git Basics',

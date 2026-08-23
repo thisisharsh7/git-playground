@@ -5,5 +5,6 @@ import { afterEach } from 'vitest'
 afterEach(() => {
   cleanup()
   // The app persists only `git-lessons-progress` and `git-master-theme`.
-  localStorage.clear()
+  // Absent in files using `// @vitest-environment node`.
+  if (typeof localStorage !== 'undefined') localStorage.clear()
 })

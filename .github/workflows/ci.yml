@@ -23,3 +23,5 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
+      # Separate step so a metadata regression fails with an unambiguous message.
+      - run: npm run verify:seo
