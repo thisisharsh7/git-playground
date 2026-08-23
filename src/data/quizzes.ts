@@ -6,7 +6,7 @@ export const quizzes: Quiz[] = [
     lessonId: 'git-basics',
     title: 'Git Basics Quiz',
     description: 'Test your understanding of fundamental Git concepts',
-    passingScore: 70,
+    passingScore: 60,
     timeLimit: 10,
     questions: [
       {
@@ -80,7 +80,7 @@ export const quizzes: Quiz[] = [
     lessonId: 'branching',
     title: 'Branching & Merging Quiz',
     description: 'Test your knowledge of Git branches and merging',
-    passingScore: 75,
+    passingScore: 60,
     timeLimit: 12,
     questions: [
       {
@@ -228,7 +228,7 @@ export const quizzes: Quiz[] = [
     lessonId: 'advanced-git',
     title: 'Advanced Git Quiz',
     description: 'Test your mastery of advanced Git techniques',
-    passingScore: 85,
+    passingScore: 80,
     timeLimit: 20,
     questions: [
       {

@@ -109,21 +109,24 @@ describe('quiz scoring thresholds', () => {
   const attainable = (total: number) =>
     Array.from({ length: total + 1 }, (_, correct) => Math.round((correct / total) * 100))
 
-  // Documents the drift between the advertised threshold and the real one.
-  it('effective minimum passing score per quiz', () => {
-    const effective = quizzes.map((quiz) => {
-      const scores = attainable(quiz.questions.length)
-      return Math.min(...scores.filter((score) => score >= quiz.passingScore))
-    })
-    expect(quizzes.map((quiz) => quiz.passingScore)).toEqual([70, 75, 80, 85])
-    expect(effective).toEqual([80, 80, 80, 100])
+  // FIXED in Phase 4C. The advertised threshold is now the real one: each
+  // passingScore is itself an attainable score, so "60% required" means 3/5 and
+  // not "actually 4/5". Previously 85 silently demanded a perfect score.
+  it('every passingScore is an attainable score', () => {
+    for (const quiz of quizzes) {
+      expect(attainable(quiz.questions.length), quiz.id).toContain(quiz.passingScore)
+    }
   })
 
-  // KNOWN DEFECT (D2.3), fixed in Phase 4. advanced-git advertises "85% required"
-  // but 85 is unattainable on 5 questions, so it silently demands a perfect
-  // score. it.fails() keeps CI green; when Phase 4 lands an achievable value
-  // this test will start failing and must be converted to a plain it().
-  it.fails('every quiz is passable without a perfect score', () => {
+  it('the advertised threshold equals the effective threshold', () => {
+    for (const quiz of quizzes) {
+      const scores = attainable(quiz.questions.length)
+      const effective = Math.min(...scores.filter((score) => score >= quiz.passingScore))
+      expect(effective, quiz.id).toBe(quiz.passingScore)
+    }
+  })
+
+  it('every quiz is passable without a perfect score', () => {
     for (const quiz of quizzes) {
       const scores = attainable(quiz.questions.length)
       const passingBelowPerfect = scores.filter(
@@ -131,6 +134,11 @@ describe('quiz scoring thresholds', () => {
       )
       expect(passingBelowPerfect.length, quiz.id).toBeGreaterThan(0)
     }
+  })
+
+  it('keeps a non-decreasing difficulty ramp across the lesson order', () => {
+    const scores = quizzes.map((quiz) => quiz.passingScore)
+    expect(scores).toEqual([...scores].sort((a, b) => a - b))
   })
 })
 
