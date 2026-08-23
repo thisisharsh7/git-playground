@@ -1,68 +1,10 @@
-'use client';
+import { PlaygroundTabs } from "@/components/playground/playground-tabs";
+import { SUPPORTED_COMMANDS } from "@/lib/git-engine";
+import { Terminal, BookOpen, BarChart3, Info } from 'lucide-react';
 
-import { useState, useEffect, useCallback, Suspense } from 'react';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { GitLessons } from "@/components/git-lessons";
-import { GitCommands } from "@/components/git-commands";
-import { GitVisualization } from "@/components/git-visualization";
-import { GitPlayground } from "@/components/playground/git-playground";
-import { Terminal, Play, BookOpen, Command, BarChart3, CheckCircle } from 'lucide-react';
-
-function GitPlaygroundContent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  // Get URL parameters
-  const tabParam = searchParams.get('tab');
-  const searchQuery = searchParams.get('search') || '';
-  const lessonQuery = searchParams.get('lesson') || '';
-
-  // Validate and set initial tab
-  const validTabs = ['playground', 'lessons', 'commands', 'visualization'];
-  const initialTab = tabParam && validTabs.includes(tabParam) ? tabParam : 'playground';
-
-  const [selectedSection, setSelectedSection] = useState(initialTab);
-
-  // Update URL when tab changes
-  const updateURL = useCallback((tab: string, search?: string, lesson?: string) => {
-    const params = new URLSearchParams();
-    params.set('tab', tab);
-    if (search && search.trim()) {
-      params.set('search', search);
-    }
-    if (lesson && lesson.trim()) {
-      params.set('lesson', lesson);
-    }
-    const newURL = `${pathname}?${params.toString()}`;
-    router.replace(newURL, { scroll: false });
-  }, [pathname, router]);
-
-  // Handle tab changes
-  const handleTabChange = useCallback((tab: string) => {
-    setSelectedSection(tab);
-    updateURL(tab, searchQuery);
-  }, [updateURL, searchQuery]);
-
-  // The lessonId used to be logged and thrown away, so every "practice this"
-  // button landed on the generic lesson list (D1.13).
-  const handleNavigateToLesson = useCallback((lessonId: string) => {
-    setSelectedSection('lessons');
-    updateURL('lessons', undefined, lessonId);
-  }, [updateURL]);
-
-  // Sync with URL parameters on mount and when they change
-  useEffect(() => {
-    const validTabs = ['playground', 'lessons', 'commands', 'visualization'];
-    const currentTab = searchParams.get('tab');
-    const validTab = currentTab && validTabs.includes(currentTab) ? currentTab : 'playground';
-
-    if (validTab !== selectedSection) {
-      setSelectedSection(validTab);
-    }
-  }, [searchParams, selectedSection]);
-
+// Server component. The hero, the intro and the default tab's content all
+// prerender into the HTML; only the query-string reader is deferred.
+export default function GitPlaygroundPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950" suppressHydrationWarning>
 
@@ -81,108 +23,63 @@ function GitPlaygroundContent() {
                 </div>
               </div>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text py-1.5 text-transparent mb-2.5">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white mb-2.5">
               Git Playground
             </h1>
-            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-8">
-              Master Git commands through interactive practice with real-time feedback and beautiful visualizations
+            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
+              A browser-based workspace for learning Git. Practise commands in a simulated
+              repository, work through lessons with quizzes, and look up what each command does.
             </p>
 
-            {/* Feature Pills */}
-            <div className="flex flex-wrap justify-center gap-3">
-              <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-slate-200/50 dark:border-slate-700/50">
-                <Terminal className="w-4 h-4 text-green-600 dark:text-green-400" />
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Live Terminal</span>
+            {/* What the workspace contains */}
+            <div className="mt-8 grid gap-4 sm:grid-cols-3 max-w-4xl mx-auto text-left">
+              <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-slate-200/50 dark:border-slate-700/50">
+                <h2 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
+                  <Terminal className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  Command practice
+                </h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                  Type Git commands and watch the branch, staging area and commit history change.
+                </p>
               </div>
-              <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-slate-200/50 dark:border-slate-700/50">
-                <BarChart3 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Visual Feedback</span>
+              <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-slate-200/50 dark:border-slate-700/50">
+                <h2 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
+                  <BookOpen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  Lessons and quizzes
+                </h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                  Four guided lessons, from the basics to rebasing, each ending in a short quiz.
+                </p>
               </div>
-              <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-slate-200/50 dark:border-slate-700/50">
-                <CheckCircle className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Safe Environment</span>
+              <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-slate-200/50 dark:border-slate-700/50">
+                <h2 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
+                  <BarChart3 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                  Reference and diagrams
+                </h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                  Look up any documented command, and see how branching and merging fit together.
+                </p>
               </div>
+            </div>
+
+            {/* Honest scope. The verb list comes from the engine itself, so it
+                cannot drift from what the terminal really runs. */}
+            <div className="mt-6 max-w-4xl mx-auto text-left bg-amber-50/80 dark:bg-amber-900/20 border border-amber-200/70 dark:border-amber-800/50 rounded-xl p-4">
+              <h2 className="flex items-center gap-2 font-semibold text-amber-900 dark:text-amber-300">
+                <Info className="w-4 h-4" />
+                What the simulator does and does not do
+              </h2>
+              <p className="mt-1 text-sm text-amber-900/90 dark:text-amber-200/90">
+                The terminal runs {SUPPORTED_COMMANDS.map(c => `git ${c}`).join(', ')} against an
+                in-memory repository. Other commands are explained in the reference but are not
+                executable here, and nothing you type can affect a real repository or your machine.
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Tabs Component with Sticky Navigation */}
-      <Tabs value={selectedSection} onValueChange={handleTabChange} className="w-full">
-        {/* Sticky Tab Navigation */}
-        <div className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md ">
-          <div className="max-w-7xl mx-auto">
-            <TabsList className="grid w-full px-2 sm:px-3 lg:px-8 xl:px-6 grid-cols-4 h-14 bg-slate-100/50 dark:bg-slate-800/50 border-0 rounded-none">
-              <TabsTrigger
-                value="playground"
-                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-blue-600 dark:data-[state=active]:to-purple-600 dark:data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
-              >
-                <Play className="w-4 h-4" />
-                <span className="hidden sm:inline font-medium">Playground</span>
-                <span className="sm:hidden font-medium">Play</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="lessons"
-                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-green-600 dark:data-[state=active]:to-emerald-600 dark:data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
-              >
-                <BookOpen className="w-4 h-4" />
-                <span className="hidden sm:inline font-medium">Lessons</span>
-                <span className="sm:hidden font-medium">Learn</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="commands"
-                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-orange-600 dark:data-[state=active]:to-amber-600 dark:data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
-              >
-                <Command className="w-4 h-4" />
-                <span className="hidden sm:inline font-medium">Commands</span>
-                <span className="sm:hidden font-medium">Cmd</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="visualization"
-                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white dark:data-[state=active]:bg-gradient-to-r dark:data-[state=active]:from-purple-600 dark:data-[state=active]:to-pink-600 dark:data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
-              >
-                <BarChart3 className="w-4 h-4" />
-                <span className="hidden sm:inline font-medium">Visualization</span>
-                <span className="sm:hidden font-medium">Visual</span>
-              </TabsTrigger>
-            </TabsList>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 w-full max-w-full">
-          <TabsContent value="playground" className="space-y-8 mt-0">
-            <GitPlayground />
-          </TabsContent>
-
-          <TabsContent value="lessons" className="mt-0">
-            <GitLessons initialLessonId={lessonQuery} />
-          </TabsContent>
-
-          <TabsContent value="commands" className="mt-0">
-            <GitCommands initialSearch={searchQuery} />
-          </TabsContent>
-
-          <TabsContent value="visualization" className="mt-0">
-            <GitVisualization onNavigateToLesson={handleNavigateToLesson} />
-          </TabsContent>
-        </div>
-      </Tabs>
+      <PlaygroundTabs />
     </div>
-  );
-}
-
-export default function GitPlaygroundPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600 dark:text-slate-400">Loading Git Playground...</p>
-        </div>
-      </div>
-    }>
-      <GitPlaygroundContent />
-    </Suspense>
   );
 }

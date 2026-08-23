@@ -34,10 +34,29 @@ const PAGES = [
     canonical: `${ORIGIN}/git-playground`,
     title:
       'Git Playground - Interactive Learning - Git Master | Interactive Git Learning Platform',
-    mustContain: [],
-    // No h1 today: useSearchParams inside <Suspense> makes this page prerender
-    // only its spinner fallback. Fixed in Phase 8; pinned as 0 until then.
-    h1: null,
+    // Phase 8 moved useSearchParams into a null-rendering leaf, so this page
+    // prerenders real content instead of only its loading spinner.
+    mustContain: [
+      'A browser-based workspace for learning Git',
+      'Command practice',
+      'Lessons and quizzes',
+      'What the simulator does and does not do',
+      // The honest scope note, generated from the engine's own verb list.
+      'git add, git branch, git checkout, git commit, git log, git remote, git status',
+      // Default tab content must be in the HTML, not injected after hydration.
+      'Type your Git command here',
+      'Repository State',
+      'Quick Commands',
+    ],
+    mustNotContain: [
+      // The spinner must no longer be the whole page.
+      'Loading Git Playground',
+      // Only the default tab renders, so the other tabs must not leak in —
+      // notably the Commands tab, which carries its own h1.
+      'Git Command Reference',
+      'Git Workflow Visualization',
+    ],
+    h1: 'Git Playground',
   },
 ]
 

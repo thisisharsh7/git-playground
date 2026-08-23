@@ -15,6 +15,12 @@ export default defineConfig({
     css: false,
     clearMocks: true,
     restoreMocks: true,
+    // The 5s default is tuned for fast unit tests. Rendering the whole command
+    // catalogue and the visualization in jsdom, or running axe over a full
+    // page, legitimately takes seconds — and exceeded 5s under parallel load,
+    // producing flaky timeouts rather than real failures.
+    testTimeout: 20000,
+    hookTimeout: 20000,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['node_modules/**', '.next/**'],
     // toLocaleString() is ICU-dependent; pin TZ for deterministic git log output.

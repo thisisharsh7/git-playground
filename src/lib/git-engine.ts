@@ -48,6 +48,21 @@ export interface CommandResult {
   success: boolean;
 }
 
+/**
+ * The verbs the terminal can actually execute. Exported so the usage message and
+ * the user-facing scope note are generated from one list and cannot drift from
+ * what the switch below really handles.
+ */
+export const SUPPORTED_COMMANDS = [
+  'add',
+  'branch',
+  'checkout',
+  'commit',
+  'log',
+  'remote',
+  'status',
+] as const;
+
 export interface EngineDeps {
   now?: () => string;
   nextId?: () => string;
@@ -224,7 +239,7 @@ export function executeGitCommand(
       state: newGitState,
       output:
         'usage: git <command> [<args>]\n\n' +
-        'Supported commands: add, branch, checkout, commit, log, remote, status',
+        `Supported commands: ${SUPPORTED_COMMANDS.join(', ')}`,
       success: false,
     };
   }
