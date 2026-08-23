@@ -84,12 +84,25 @@ describe('quizzes', () => {
     }
   })
 
-  // quiz.tsx renders nothing for 'fill-blank' even though the type allows it,
-  // so adding one would ship an unanswerable question. This guard fails first.
-  it('contains no fill-blank question', () => {
+  // Was "contains no fill-blank question", guarding against shipping an
+  // unanswerable one. Phase 4D made fill-blank renderable and scorable, so the
+  // useful guard now is that every shipped type has a renderer.
+  it('every question type has a renderer in quiz.tsx', () => {
+    const renderable = new Set(['multiple-choice', 'true-false', 'fill-blank'])
     for (const quiz of quizzes) {
       for (const question of quiz.questions) {
-        expect(question.type, `${quiz.id}/${question.id}`).not.toBe('fill-blank')
+        expect(renderable.has(question.type), `${quiz.id}/${question.id}`).toBe(true)
+      }
+    }
+  })
+
+  // A fill-blank answer is compared as a trimmed, lowercased string, so its
+  // correctAnswer must be a string rather than an index or boolean.
+  it('every fill-blank question has a string answer', () => {
+    for (const quiz of quizzes) {
+      for (const question of quiz.questions) {
+        if (question.type !== 'fill-blank') continue
+        expect(typeof question.correctAnswer, `${quiz.id}/${question.id}`).toBe('string')
       }
     }
   })

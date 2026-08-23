@@ -5,10 +5,39 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { CheckCircle, XCircle, Clock, Trophy, ArrowRight, ArrowLeft } from 'lucide-react';
 import type { Quiz, QuizQuestion } from '@/types/quiz';
 
 export type { Quiz, QuizQuestion };
+
+type Answer = string | number | boolean;
+
+/**
+ * Free-text answers are compared case-insensitively and trimmed; the other
+ * types keep strict equality so existing scoring is unchanged.
+ */
+function isAnswerCorrect(question: QuizQuestion, answer: Answer | undefined): boolean {
+  if (answer === undefined) return false;
+  if (question.type === 'fill-blank') {
+    return (
+      typeof answer === 'string' &&
+      typeof question.correctAnswer === 'string' &&
+      answer.trim().toLowerCase() === question.correctAnswer.trim().toLowerCase()
+    );
+  }
+  return answer === question.correctAnswer;
+}
+
+/** A blank or whitespace-only free-text answer does not count as answered. */
+function hasAnswer(question: QuizQuestion, answer: Answer | undefined): boolean {
+  if (answer === undefined) return false;
+  if (question.type === 'fill-blank') {
+    return typeof answer === 'string' && answer.trim() !== '';
+  }
+  return true;
+}
 
 interface QuizProps {
   quiz: Quiz;
@@ -31,9 +60,9 @@ export function QuizComponent({ quiz, onComplete, onBack }: QuizProps) {
 
   const handleSubmitQuiz = useCallback(() => {
     let correctAnswers = 0;
-    
+
     quiz.questions.forEach(question => {
-      if (answers[question.id] === question.correctAnswer) {
+      if (isAnswerCorrect(question, answers[question.id])) {
         correctAnswers++;
       }
     });
@@ -337,6 +366,23 @@ export function QuizComponent({ quiz, onComplete, onBack }: QuizProps) {
             </div>
           )}
 
+          {/* The type has always allowed fill-blank, but nothing rendered for
+              it, so such a question was unanswerable with no visible controls
+              (D2.12). */}
+          {currentQuestion.type === 'fill-blank' && (
+            <div className="space-y-2">
+              <Label htmlFor={`answer-${currentQuestion.id}`}>Your answer</Label>
+              <Input
+                id={`answer-${currentQuestion.id}`}
+                value={typeof answers[currentQuestion.id] === 'string' ? String(answers[currentQuestion.id]) : ''}
+                onChange={(e) => handleAnswerSelect(e.target.value)}
+                placeholder="Type your answer"
+                autoComplete="off"
+                className="font-mono"
+              />
+            </div>
+          )}
+
           {showExplanation && (
             <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
               <h4 className="font-semibold text-blue-800 dark:text-blue-400 mb-2">Explanation:</h4>
@@ -355,7 +401,7 @@ export function QuizComponent({ quiz, onComplete, onBack }: QuizProps) {
             </Button>
 
             <div className="flex gap-2">
-              {answers[currentQuestion.id] !== undefined && !showExplanation && (
+              {hasAnswer(currentQuestion, answers[currentQuestion.id]) && !showExplanation && (
                 <Button
                   variant="outline"
                   onClick={() => setShowExplanation(true)}
@@ -365,7 +411,7 @@ export function QuizComponent({ quiz, onComplete, onBack }: QuizProps) {
               )}
               <Button
                 onClick={handleNextQuestion}
-                disabled={answers[currentQuestion.id] === undefined}
+                disabled={!hasAnswer(currentQuestion, answers[currentQuestion.id])}
                 className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
               >
                 {isLastQuestion ? 'Submit Quiz' : 'Next'}
