@@ -73,11 +73,11 @@ export function ThemeProvider({
   );
 }
 
+// The removed guard checked `context === undefined`, which could never be true:
+// createContext above is given a non-undefined default, so useContext outside a
+// provider returns that default rather than undefined (D2.11). Deleting the
+// dead branch is behaviour-preserving. Making it live instead — by defaulting
+// the context to undefined — would change what misuse does, so it is left as is.
 export const useTheme = () => {
-  const context = useContext(ThemeProviderContext);
-
-  if (context === undefined)
-    throw new Error('useTheme must be used within a ThemeProvider');
-
-  return context;
+  return useContext(ThemeProviderContext);
 };
