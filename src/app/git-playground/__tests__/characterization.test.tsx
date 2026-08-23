@@ -232,15 +232,28 @@ describe('pinned defects', () => {
     })
   })
 
-  describe('D1.11 arguments are split on a single space', () => {
-    it('pins: a double space breaks the command', async () => {
-      await type('git  status')
-      expect(out()).toContain("git: '' is not a git command. See 'git --help'.")
-    })
-
-    it.fails('extra whitespace should be tolerated', async () => {
+  // FIXED in Phase 4B.
+  describe('D1.11 whitespace handling', () => {
+    it('tolerates repeated inner whitespace', async () => {
       await type('git  status')
       expect(out()).toContain('On branch main')
+      expect(out()).not.toContain("git: '' is not a git command.")
+    })
+
+    it('tolerates surrounding whitespace', async () => {
+      await type('   git status   ')
+      expect(out()).toContain('On branch main')
+    })
+
+    it('tolerates tabs between arguments', async () => {
+      await type('git\tbranch\tfeature')
+      expect(out()).toContain("Created branch 'feature'")
+    })
+
+    it('still keeps whitespace inside a quoted commit message', async () => {
+      await quick('Add All')
+      await type('git   commit   -m   "two  spaces"')
+      expect(out()).toContain('two  spaces')
     })
   })
 

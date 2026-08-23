@@ -140,8 +140,11 @@ export function executeGitCommand(
   let success = true;
   const newGitState = { ...state };
 
-  // Parse and execute Git commands
-  const parts = trimmedCmd.split(' ');
+  // Split on runs of whitespace. Splitting on a single space meant any repeated
+  // space produced an empty token, so `git  status` reported an empty
+  // subcommand and every command broke (D1.11). Commit messages are parsed from
+  // the raw input, so collapsing whitespace here does not affect them.
+  const parts = trimmedCmd.split(/\s+/);
   const gitCommand = parts[1];
 
   // Bare `git` used to fall through to the default branch, which interpolated
