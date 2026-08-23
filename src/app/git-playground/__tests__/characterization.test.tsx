@@ -391,6 +391,33 @@ describe('pinned defects', () => {
   })
 
   // FIXED in Phase 4C.
+  describe('D1.12 text typed during execution', () => {
+    it('survives the command that is already running', async () => {
+      const input = screen.getByPlaceholderText(PLACEHOLDER) as HTMLInputElement
+
+      // Submit a command, then type the next one during the 300ms window.
+      fireEvent.change(input, { target: { value: 'git status' } })
+      fireEvent.click(screen.getByRole('button', { name: 'Execute' }))
+      expect(input.value).toBe('')
+
+      fireEvent.change(input, { target: { value: 'git branch' } })
+      await settle()
+
+      // Previously setCommand('') ran when the command resolved, wiping this.
+      expect(input.value).toBe('git branch')
+    })
+
+    it('clears the prompt as soon as a command is submitted', async () => {
+      const input = screen.getByPlaceholderText(PLACEHOLDER) as HTMLInputElement
+      fireEvent.change(input, { target: { value: 'git status' } })
+      fireEvent.click(screen.getByRole('button', { name: 'Execute' }))
+      expect(input.value).toBe('')
+      await settle()
+      expect(input.value).toBe('')
+    })
+  })
+
+  // FIXED in Phase 4C.
   describe('D1.14 terminal focus', () => {
     it('keeps the prompt enabled while a command runs', async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Status' }))

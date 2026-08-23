@@ -42,6 +42,9 @@ export function useGitRepo() {
     if (!trimmedCmd) return;
 
     setIsTyping(true);
+    // Cleared on submit, not when the command resolves. Clearing inside the
+    // timeout erased anything typed during the 300ms window (D1.12).
+    setCommand('');
 
     // Simulate typing delay for better UX
     setTimeout(() => {
@@ -58,7 +61,6 @@ export function useGitRepo() {
         success: result.success,
       }]);
       setGitState(result.state);
-      setCommand('');
       setIsTyping(false);
     }, 300); // Reduced delay for better responsiveness
   };
