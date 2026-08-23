@@ -17,6 +17,7 @@ function GitPlaygroundContent() {
   // Get URL parameters
   const tabParam = searchParams.get('tab');
   const searchQuery = searchParams.get('search') || '';
+  const lessonQuery = searchParams.get('lesson') || '';
 
   // Validate and set initial tab
   const validTabs = ['playground', 'lessons', 'commands', 'visualization'];
@@ -25,11 +26,14 @@ function GitPlaygroundContent() {
   const [selectedSection, setSelectedSection] = useState(initialTab);
 
   // Update URL when tab changes
-  const updateURL = useCallback((tab: string, search?: string) => {
+  const updateURL = useCallback((tab: string, search?: string, lesson?: string) => {
     const params = new URLSearchParams();
     params.set('tab', tab);
     if (search && search.trim()) {
       params.set('search', search);
+    }
+    if (lesson && lesson.trim()) {
+      params.set('lesson', lesson);
     }
     const newURL = `${pathname}?${params.toString()}`;
     router.replace(newURL, { scroll: false });
@@ -41,10 +45,11 @@ function GitPlaygroundContent() {
     updateURL(tab, searchQuery);
   }, [updateURL, searchQuery]);
 
+  // The lessonId used to be logged and thrown away, so every "practice this"
+  // button landed on the generic lesson list (D1.13).
   const handleNavigateToLesson = useCallback((lessonId: string) => {
     setSelectedSection('lessons');
-    updateURL('lessons');
-    console.log('Navigating to lesson:', lessonId);
+    updateURL('lessons', undefined, lessonId);
   }, [updateURL]);
 
   // Sync with URL parameters on mount and when they change
@@ -151,7 +156,7 @@ function GitPlaygroundContent() {
           </TabsContent>
 
           <TabsContent value="lessons" className="mt-0">
-            <GitLessons />
+            <GitLessons initialLessonId={lessonQuery} />
           </TabsContent>
 
           <TabsContent value="commands" className="mt-0">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -74,7 +74,12 @@ export const lessons: Lesson[] = [
   }
 ];
 
-export function GitLessons() {
+interface GitLessonsProps {
+  /** Lesson to open on arrival, from `?lesson=` (D1.13). */
+  initialLessonId?: string;
+}
+
+export function GitLessons({ initialLessonId = '' }: GitLessonsProps = {}) {
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [isInInteractiveMode, setIsInInteractiveMode] = useState(false);
   const [isInQuizMode, setIsInQuizMode] = useState(false);
@@ -117,14 +122,28 @@ export function GitLessons() {
     return progress.find(p => p.lessonId === lessonId);
   };
 
-  const isLessonUnlocked = (lessonIndex: number): boolean => {
+  // Memoised on `progress` so the deep-link effect below can depend on it
+  // honestly instead of suppressing the exhaustive-deps rule.
+  const isLessonUnlocked = useCallback((lessonIndex: number): boolean => {
     if (lessonIndex === 0) return true; // First lesson is always unlocked
-    
+
     const previousLesson = lessons[lessonIndex - 1];
-    const previousProgress = getLessonProgress(previousLesson.id);
-    
+    const previousProgress = progress.find(p => p.lessonId === previousLesson.id);
+
     return previousProgress?.quizPassed === true;
-  };
+  }, [progress]);
+
+  // Open the requested lesson once, and only if it is unlocked, so a deep link
+  // cannot bypass the progression gate. Re-runs when progress arrives from
+  // localStorage, then latches so pressing Back does not reopen it.
+  const honouredLessonId = useRef<string | null>(null);
+  useEffect(() => {
+    if (!initialLessonId || honouredLessonId.current === initialLessonId) return;
+    const index = lessons.findIndex(lesson => lesson.id === initialLessonId);
+    if (index === -1 || !isLessonUnlocked(index)) return;
+    honouredLessonId.current = initialLessonId;
+    setSelectedLesson(lessons[index]);
+  }, [initialLessonId, isLessonUnlocked]);
 
   const updateLessonProgress = (lessonId: string, updates: Partial<LessonProgress>) => {
     setProgress(prev => {
