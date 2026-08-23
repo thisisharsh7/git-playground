@@ -23,6 +23,12 @@ export interface GitState {
   stagingArea: string[];
   remotes: string[];
   status: string;
+  // Branch name -> the branch it was created from, and the number of commits
+  // that existed at that moment. Together these give `git log` an ancestry to
+  // walk (D1.3). The model has no per-commit parent pointers, so the branch
+  // point is what stops a branch from seeing commits its parent gained later.
+  branchParents: Record<string, string>;
+  branchPoints: Record<string, number>;
 }
 
 export interface CommandHistory {
@@ -61,7 +67,9 @@ export const createInitialGitState = (): GitState => ({
   workingDirectory: ['README.md', 'index.html'],
   stagingArea: [],
   remotes: [],
-  status: 'clean'
+  status: 'clean',
+  branchParents: {},
+  branchPoints: {}
 });
 
 export const createInitialCommandHistory = (): CommandHistory[] => ([
@@ -124,6 +132,36 @@ function parseCommitMessage(input: string): string | null {
   return match[2] ?? match[3] ?? match[4] ?? '';
 }
 
+/**
+ * Commits reachable from `branch`, oldest first.
+ *
+ * Walks the branch's ancestry. Each hop up caps the visible commit index at the
+ * point where the child split off, so a branch never sees commits its parent
+ * gained afterwards. Previously `git log` filtered on `commit.branch` alone, so
+ * a freshly created branch reported no history at all (D1.3).
+ */
+function visibleCommits(state: GitState, branch: string): GitState['commits'] {
+  const collected: Array<{ commit: GitState['commits'][number]; index: number }> = [];
+  const seen = new Set<string>();
+  let current: string | undefined = branch;
+  let limit = Number.POSITIVE_INFINITY;
+
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    // Annotated: inferring this creates a circular reference, because `current`
+    // is later reassigned from a lookup keyed on it.
+    const branchName: string = current;
+    const cap = limit;
+    state.commits.forEach((commit, index) => {
+      if (commit.branch === branchName && index < cap) collected.push({ commit, index });
+    });
+    limit = state.branchPoints[branchName] ?? Number.POSITIVE_INFINITY;
+    current = state.branchParents[branchName];
+  }
+
+  return collected.sort((a, b) => a.index - b.index).map(entry => entry.commit);
+}
+
 export function executeGitCommand(
   state: GitState,
   input: string,
@@ -149,6 +187,8 @@ export function executeGitCommand(
     workingDirectory: [...state.workingDirectory],
     stagingArea: [...state.stagingArea],
     remotes: [...state.remotes],
+    branchParents: { ...state.branchParents },
+    branchPoints: { ...state.branchPoints },
   };
 
   // Split on runs of whitespace. Splitting on a single space meant any repeated
@@ -242,6 +282,8 @@ export function executeGitCommand(
           const tip = [...newGitState.commits].reverse()
             .find(c => c.branch === target) ?? newGitState.commits[newGitState.commits.length - 1];
           newGitState.branches = newGitState.branches.filter(b => b !== target);
+          delete newGitState.branchParents[target];
+          delete newGitState.branchPoints[target];
           output = `Deleted branch ${target} (was ${tip.id}).`;
         }
       } else if (arg && arg.startsWith('-')) {
@@ -252,6 +294,8 @@ export function executeGitCommand(
       } else if (arg) {
         if (!newGitState.branches.includes(arg)) {
           newGitState.branches.push(arg);
+          newGitState.branchParents[arg] = newGitState.currentBranch;
+          newGitState.branchPoints[arg] = newGitState.commits.length;
           output = `Created branch '${arg}'`;
         } else {
           output = `fatal: A branch named '${arg}' already exists.`;
@@ -278,6 +322,8 @@ export function executeGitCommand(
           success = false;
         } else {
           newGitState.branches.push(target);
+          newGitState.branchParents[target] = newGitState.currentBranch;
+          newGitState.branchPoints[target] = newGitState.commits.length;
           newGitState.currentBranch = target;
           output = `Switched to a new branch '${target}'`;
         }
@@ -298,8 +344,7 @@ export function executeGitCommand(
       break;
     }
     case 'log':
-      output = newGitState.commits
-        .filter(c => c.branch === newGitState.currentBranch)
+      output = visibleCommits(newGitState, newGitState.currentBranch)
         .reverse()
         .map(c => `commit ${c.id}\nAuthor: ${c.author}\nDate: ${formatTimestamp(c.timestamp)}\n\n    ${c.message}\n`)
         .join('\n');

@@ -182,21 +182,39 @@ describe('pinned defects', () => {
     })
   })
 
-  describe('D1.3 git log has no ancestry model', () => {
-    it('pins: log is empty on a freshly created branch', async () => {
-      await quick('New Branch')
-      await quick('Checkout')
-      await quick('Log')
-      // Real git would list the inherited commit here. The transcript never
-      // gains it because commits are filtered by branch name.
-      expect(out()).not.toContain('commit a1b2c3d')
-    })
-
-    it.fails('a new branch should inherit its parent history', async () => {
+  // FIXED in Phase 4B.
+  describe('D1.3 git log ancestry', () => {
+    it('a new branch inherits its parent history', async () => {
       await quick('New Branch')
       await quick('Checkout')
       await quick('Log')
       expect(out()).toContain('commit a1b2c3d')
+    })
+
+    it('a branch created with checkout -b inherits history too', async () => {
+      await type('git checkout -b feature')
+      await quick('Log')
+      expect(out()).toContain('commit a1b2c3d')
+    })
+
+    it('a branch does not see commits its parent gained after the split', async () => {
+      // Branch first, then commit on main, then look from the branch.
+      await quick('New Branch')
+      await quick('Add All')
+      await type('git commit -m "later on main"')
+      await quick('Checkout')
+      await quick('Log')
+      expect(out()).toContain('commit a1b2c3d')
+      expect(out()).not.toContain('    later on main')
+    })
+
+    it('main does not see commits made on a branch', async () => {
+      await type('git checkout -b feature')
+      await quick('Add All')
+      await type('git commit -m "only on feature"')
+      await type('git checkout main')
+      await quick('Log')
+      expect(out()).not.toContain('    only on feature')
     })
   })
 
