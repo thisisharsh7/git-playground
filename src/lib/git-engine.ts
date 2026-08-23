@@ -113,6 +113,17 @@ const defaultNextId = () => {
 };
 const defaultFormatTimestamp = (timestamp: string) => new Date(timestamp).toLocaleString();
 
+/**
+ * Extracts the message from `git commit -m ...`.
+ * Returns null when -m is absent, or the message (possibly empty) when present.
+ * Handles "double quoted", 'single quoted' and a single bare token.
+ */
+function parseCommitMessage(input: string): string | null {
+  const match = input.match(/\s-m(?:\s+|=)("([^"]*)"|'([^']*)'|(\S+))/);
+  if (!match) return input.match(/\s-m(\s*)$/) ? '' : null;
+  return match[2] ?? match[3] ?? match[4] ?? '';
+}
+
 export function executeGitCommand(
   state: GitState,
   input: string,
@@ -171,12 +182,22 @@ export function executeGitCommand(
         success = false;
       }
       break;
-    case 'commit':
-      if (newGitState.stagingArea.length > 0) {
-        const message = parts.slice(3).join(' ') || 'Commit message';
+    case 'commit': {
+      // Parsed from the raw input, not from whitespace-split tokens, so quoted
+      // messages keep their internal spacing and apostrophes survive. The old
+      // code joined tokens and stripped every quote character, which turned
+      // "it's fine" into "its fine", and never required -m at all (D1.8).
+      const message = parseCommitMessage(trimmedCmd);
+      if (message === null) {
+        output = 'usage: git commit -m <message>';
+        success = false;
+      } else if (message === '') {
+        output = 'Aborting commit due to empty commit message.';
+        success = false;
+      } else if (newGitState.stagingArea.length > 0) {
         const newCommit = {
           id: nextId(),
-          message: message.replace(/['"]/g, ''),
+          message,
           author: 'Developer',
           timestamp: now(),
           branch: newGitState.currentBranch
@@ -189,6 +210,7 @@ export function executeGitCommand(
         success = false;
       }
       break;
+    }
     case 'branch': {
       const arg = parts[2];
       if (arg === '-d' || arg === '-D') {

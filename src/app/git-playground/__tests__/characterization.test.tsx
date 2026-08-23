@@ -296,17 +296,37 @@ describe('pinned defects', () => {
     })
   })
 
-  describe('D1.8 git commit does not require -m', () => {
-    it('pins: bare git commit uses a placeholder message', async () => {
+  // FIXED in Phase 4B.
+  describe('D1.8 git commit -m parsing', () => {
+    it('bare git commit prints usage instead of inventing a message', async () => {
       await quick('Add All')
       await type('git commit')
-      expect(out()).toMatch(/\[main \S+\] Commit message/)
+      expect(out()).toContain('usage: git commit -m <message>')
+      expect(out()).not.toContain('Commit message')
     })
 
-    it.fails('bare git commit should not invent a message', async () => {
+    it('keeps apostrophes inside a double-quoted message', async () => {
       await quick('Add All')
-      await type('git commit')
-      expect(out()).not.toContain('Commit message')
+      await type('git commit -m "it\'s fine"')
+      expect(out()).toMatch(/\[main [0-9a-f]{7}\] it's fine/)
+    })
+
+    it('keeps internal spacing in a quoted message', async () => {
+      await quick('Add All')
+      await type('git commit -m "two  spaces"')
+      expect(out()).toContain('two  spaces')
+    })
+
+    it('accepts a single unquoted token', async () => {
+      await quick('Add All')
+      await type('git commit -m wip')
+      expect(out()).toMatch(/\[main [0-9a-f]{7}\] wip/)
+    })
+
+    it('refuses an empty message', async () => {
+      await quick('Add All')
+      await type('git commit -m ""')
+      expect(out()).toContain('Aborting commit due to empty commit message.')
     })
   })
 
