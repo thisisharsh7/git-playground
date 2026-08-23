@@ -53,6 +53,63 @@ describe('executeGitCommand', () => {
   })
 })
 
+// D1.9, at the engine level: the exact status text at each lifecycle stage.
+describe('D1.9 working-tree lifecycle', () => {
+  it('reports untracked files on a fresh repo', () => {
+    expect(run(createInitialGitState(), 'git status').output).toBe(
+      'On branch main\n' +
+        '\nUntracked files:\n' +
+        '  (use "git add <file>..." to include in what will be committed)\n\n' +
+        '\tREADME.md\n' +
+        '\tindex.html\n' +
+        '\nnothing added to commit but untracked files present (use "git add" to track)',
+    )
+  })
+
+  it('reports staged files as new files before the first commit', () => {
+    const staged = run(createInitialGitState(), 'git add .').state
+    expect(run(staged, 'git status').output).toBe(
+      'On branch main\n' +
+        '\nChanges to be committed:\n' +
+        '  (use "git restore --staged <file>..." to unstage)\n\n' +
+        '\tnew file:   README.md\n' +
+        '\tnew file:   index.html\n',
+    )
+  })
+
+  it('reports a clean tree after committing everything', () => {
+    let state = createInitialGitState()
+    state = run(state, 'git add .').state
+    state = run(state, 'git commit -m "first"').state
+    expect(run(state, 'git status').output).toBe(
+      'On branch main\nnothing to commit, working tree clean',
+    )
+  })
+
+  it('has nothing to stage or commit once everything is tracked', () => {
+    let state = createInitialGitState()
+    state = run(state, 'git add .').state
+    state = run(state, 'git commit -m "first"').state
+
+    const added = run(state, 'git add .')
+    expect(added.output).toBe('')
+    expect(added.success).toBe(true)
+
+    const committed = run(state, 'git commit -m "second"')
+    expect(committed.output).toBe('nothing to commit, working tree clean')
+    expect(committed.success).toBe(false)
+    expect(committed.state.commits).toHaveLength(2)
+  })
+
+  it('labels a re-staged tracked file as modified', () => {
+    let state = createInitialGitState()
+    state = run(state, 'git add .').state
+    state = run(state, 'git commit -m "first"').state
+    state = run(state, 'git add README.md').state
+    expect(run(state, 'git status').output).toContain('\tmodified:   README.md')
+  })
+})
+
 // FIXED in Phase 4B. These assertions are the reason the engine had to become
 // directly importable: the UI cannot observe input mutation, because
 // setGitState is handed a fresh top-level object either way. The damage was

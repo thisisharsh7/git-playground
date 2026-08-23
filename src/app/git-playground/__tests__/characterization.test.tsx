@@ -72,10 +72,12 @@ describe('initial state', () => {
 })
 
 describe('supported commands', () => {
-  it('git status lists both files', async () => {
+  it('git status lists both files as untracked', async () => {
     await quick('Status')
     expect(out()).toContain('On branch main')
-    expect(out()).toContain('Changes not staged for commit:')
+    // Never-committed files are untracked, not modified.
+    expect(out()).toContain('Untracked files:')
+    expect(out()).not.toContain('Changes not staged for commit:')
   })
 
   it('git add . stages everything', async () => {
@@ -99,7 +101,7 @@ describe('supported commands', () => {
 
   it('git commit with nothing staged is rejected', async () => {
     await quick('Commit')
-    expect(out()).toContain('nothing to commit, working tree clean')
+    expect(out()).toContain('nothing added to commit but untracked files present')
   })
 
   it('git branch lists main as current', async () => {
@@ -164,21 +166,48 @@ describe('supported commands', () => {
 // silently), then states the correct behaviour in an it.fails() that will begin
 // failing the moment Phase 4 lands the fix — forcing it to be converted.
 describe('pinned defects', () => {
-  describe('D1.9 git status never settles after a commit', () => {
-    it('pins: the same files stay committable forever', async () => {
-      await quick('Add All')
-      await quick('Commit')
-      await quick('Add All')
-      await quick('Commit')
-      // Two commits from one unchanged working directory.
-      expect(out().match(/\] Update files/g)).toHaveLength(2)
-    })
-
-    it.fails('a committed file should no longer be reported as modified', async () => {
+  // FIXED in Phase 4B.
+  describe('D1.9 working-tree lifecycle', () => {
+    it('a committed file is no longer reported as modified or untracked', async () => {
       await quick('Add All')
       await quick('Commit')
       await quick('Status')
       expect(out()).toContain('nothing to commit, working tree clean')
+      expect(out()).not.toContain('Untracked files:')
+    })
+
+    it('the same unchanged files cannot be committed twice', async () => {
+      await quick('Add All')
+      await quick('Commit')
+      await quick('Add All')
+      await quick('Commit')
+      // Exactly one commit from one unchanged working directory.
+      expect(out().match(/\] Update files/g)).toHaveLength(1)
+      expect(out()).toContain('nothing to commit, working tree clean')
+    })
+
+    it('staged but never-committed files are shown as new files', async () => {
+      await quick('Add All')
+      await quick('Status')
+      expect(out()).toContain('Changes to be committed:')
+      expect(out()).toContain('new file:')
+      expect(out()).not.toContain('modified:')
+    })
+
+    it('re-staging a tracked file reports it as modified, not new', async () => {
+      await quick('Add All')
+      await quick('Commit')
+      await type('git add README.md')
+      await quick('Status')
+      expect(out()).toContain('modified:')
+      expect(out()).not.toContain('new file:')
+    })
+
+    it('git add . after committing everything has nothing to stage', async () => {
+      await quick('Add All')
+      await quick('Commit')
+      await quick('Add All')
+      expect(screen.queryByText('Staged')).not.toBeInTheDocument()
     })
   })
 

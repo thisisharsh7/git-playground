@@ -21,6 +21,10 @@ export interface GitState {
   }>;
   workingDirectory: string[];
   stagingArea: string[];
+  // Files that have been committed at least once. Without this the simulator
+  // could not tell "untracked" from "clean", so it reported every file as
+  // modified forever and the same files stayed committable (D1.9).
+  trackedFiles: string[];
   remotes: string[];
   status: string;
   // Branch name -> the branch it was created from, and the number of commits
@@ -66,6 +70,8 @@ export const createInitialGitState = (): GitState => ({
   ],
   workingDirectory: ['README.md', 'index.html'],
   stagingArea: [],
+  // The seeded "Initial commit" committed nothing, so both files start untracked.
+  trackedFiles: [],
   remotes: [],
   status: 'clean',
   branchParents: {},
@@ -81,28 +87,38 @@ export const createInitialCommandHistory = (): CommandHistory[] => ([
   }
 ]);
 
+/** Working-directory files that have never been committed and are not staged. */
+function untrackedFiles(state: GitState): string[] {
+  return state.workingDirectory.filter(
+    f => !state.trackedFiles.includes(f) && !state.stagingArea.includes(f)
+  );
+}
+
 export function generateStatusOutput(state: GitState): string {
   let output = `On branch ${state.currentBranch}\n`;
 
   if (state.stagingArea.length > 0) {
     output += '\nChanges to be committed:\n';
-    output += '  (use "git reset HEAD <file>..." to unstage)\n\n';
+    output += '  (use "git restore --staged <file>..." to unstage)\n\n';
     state.stagingArea.forEach(file => {
-      output += `\tmodified:   ${file}\n`;
+      const label = state.trackedFiles.includes(file) ? 'modified:' : 'new file:';
+      output += `\t${label}   ${file}\n`;
     });
   }
 
-  const unstagedFiles = state.workingDirectory.filter(f => !state.stagingArea.includes(f));
-  if (unstagedFiles.length > 0) {
-    output += '\nChanges not staged for commit:\n';
-    output += '  (use "git add <file>..." to update what will be committed)\n\n';
-    unstagedFiles.forEach(file => {
-      output += `\tmodified:   ${file}\n`;
+  const untracked = untrackedFiles(state);
+  if (untracked.length > 0) {
+    output += '\nUntracked files:\n';
+    output += '  (use "git add <file>..." to include in what will be committed)\n\n';
+    untracked.forEach(file => {
+      output += `\t${file}\n`;
     });
   }
 
-  if (state.stagingArea.length === 0 && unstagedFiles.length === 0) {
-    output += 'nothing to commit, working tree clean';
+  if (state.stagingArea.length === 0) {
+    output += untracked.length > 0
+      ? '\nnothing added to commit but untracked files present (use "git add" to track)'
+      : 'nothing to commit, working tree clean';
   }
 
   return output;
@@ -186,6 +202,7 @@ export function executeGitCommand(
     commits: [...state.commits],
     workingDirectory: [...state.workingDirectory],
     stagingArea: [...state.stagingArea],
+    trackedFiles: [...state.trackedFiles],
     remotes: [...state.remotes],
     branchParents: { ...state.branchParents },
     branchPoints: { ...state.branchPoints },
@@ -218,8 +235,16 @@ export function executeGitCommand(
       break;
     case 'add':
       if (parts[2] === '.') {
-        newGitState.stagingArea = [...newGitState.workingDirectory];
-        output = 'Added all files to staging area';
+        // Only files that actually need staging. A tracked, unstaged file is
+        // clean, so `git add .` after a commit has nothing to do — real git
+        // prints nothing and succeeds.
+        const toStage = untrackedFiles(newGitState);
+        if (toStage.length > 0) {
+          newGitState.stagingArea = [...newGitState.stagingArea, ...toStage];
+          output = 'Added all files to staging area';
+        } else {
+          output = '';
+        }
       } else if (parts[2]) {
         if (newGitState.workingDirectory.includes(parts[2])) {
           if (!newGitState.stagingArea.includes(parts[2])) {
@@ -257,10 +282,17 @@ export function executeGitCommand(
           branch: newGitState.currentBranch
         };
         newGitState.commits.push(newCommit);
+        // Committed files become tracked, so they stop showing as untracked and
+        // cannot be committed again without a further change.
+        newGitState.trackedFiles = [
+          ...new Set([...newGitState.trackedFiles, ...newGitState.stagingArea]),
+        ];
         newGitState.stagingArea = [];
         output = `[${newGitState.currentBranch} ${newCommit.id}] ${newCommit.message}`;
       } else {
-        output = 'nothing to commit, working tree clean';
+        output = untrackedFiles(newGitState).length > 0
+          ? 'nothing added to commit but untracked files present (use "git add" to track)'
+          : 'nothing to commit, working tree clean';
         success = false;
       }
       break;
