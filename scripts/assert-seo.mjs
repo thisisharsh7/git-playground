@@ -12,8 +12,21 @@ const PAGES = [
     canonical: ORIGIN,
     title:
       'Interactive Git Learning Platform - Git Master | Interactive Git Learning Platform',
-    // The one sentence on / that carries the "playground" phrase.
-    mustContain: ['Master Git version control with our interactive playground.'],
+    mustContain: [
+      // The one sentence on / that carries the "playground" phrase.
+      'Master Git version control with our interactive playground.',
+      // The hero CTA and its anchor text must survive.
+      'Start Learning Git',
+      '/git-playground?tab=playground',
+      // Phase 7: the section heading, and proof the playground itself is in the
+      // server-rendered HTML rather than appearing only after hydration.
+      'Interactive Git Playground',
+      'Type your Git command here',
+      'Repository State',
+      'Quick Commands',
+    ],
+    // Phase 7 must not bring the heavy tabs onto the homepage.
+    mustNotContain: ['cherry-pick', 'passingScore', 'Git Workflow Visualization'],
     h1: 'Git Master',
   },
   {
@@ -95,6 +108,12 @@ for (const page of PAGES) {
   for (const needle of page.mustContain) {
     if (!html.includes(needle)) {
       fail(`${page.file}: missing required copy "${needle}"`)
+    }
+  }
+
+  for (const needle of page.mustNotContain ?? []) {
+    if (html.includes(needle)) {
+      fail(`${page.file}: unexpectedly contains "${needle}"`)
     }
   }
 

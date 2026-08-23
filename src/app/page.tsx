@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { GitPlayground } from "@/components/playground/git-playground";
 
 export default function Home() {
   return (
@@ -34,6 +35,27 @@ export default function Home() {
             </Link>
           </div>
         </div>
+
+        {/* Interactive Playground — additive section. The hero above is
+            unchanged, so the H1 and the copy that carries this page's ranking
+            remain the first content in the document. GitPlayground mounts only
+            the terminal, repository state and quick commands: lessons, quizzes,
+            the command catalogue and the visualization stay off this route.
+            headingLevel 3 keeps the outline at h1 -> h2 -> h3 with no skip. */}
+        <section aria-labelledby="interactive-git-playground" className="space-y-8 px-4">
+          <div className="text-center">
+            <h2
+              id="interactive-git-playground"
+              className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-800 dark:text-slate-100 mb-3 md:mb-5"
+            >
+              Interactive Git Playground
+            </h2>
+            <p className="text-slate-600 dark:text-slate-300 text-lg md:text-xl">
+              Run Git commands right here. Nothing is installed and no real repository is touched.
+            </p>
+          </div>
+          <GitPlayground headingLevel={3} />
+        </section>
 
         {/* Features Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 px-4">
