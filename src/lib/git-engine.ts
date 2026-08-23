@@ -101,7 +101,16 @@ export function generateStatusOutput(state: GitState): string {
 }
 
 const defaultNow = () => new Date().toISOString();
-const defaultNextId = () => Math.random().toString(36).substr(2, 7);
+
+// Fixed-length lowercase hex, so ids look like real abbreviated object names.
+// Previously Math.random().toString(36).substr(2, 7) produced variable-length
+// values containing g-z, which are not valid in a SHA (D1.10) — and the value
+// is used as a React key, so collisions produced duplicate keys.
+const defaultNextId = () => {
+  const bytes = new Uint8Array(4);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('').slice(0, 7);
+};
 const defaultFormatTimestamp = (timestamp: string) => new Date(timestamp).toLocaleString();
 
 export function executeGitCommand(

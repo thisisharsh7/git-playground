@@ -28,6 +28,21 @@ describe('executeGitCommand', () => {
     expect(result.success).toBe(true)
   })
 
+  // D1.10. Uses the real default generator, not the injected stub.
+  it('generates fixed-length lowercase hex commit ids', () => {
+    const ids = new Set<string>()
+    for (let i = 0; i < 500; i++) {
+      let state = createInitialGitState()
+      state = executeGitCommand(state, 'git add .')!.state
+      const output = executeGitCommand(state, 'git commit -m "x"')!.output
+      const id = output.match(/^\[main ([^\]]+)\]/)![1]
+      expect(id).toMatch(/^[0-9a-f]{7}$/)
+      ids.add(id)
+    }
+    // Not a strict guarantee, but 500 draws from 16^7 should not collide much.
+    expect(ids.size).toBeGreaterThan(490)
+  })
+
   // formatTimestamp must be injectable or `git log` output is locale-dependent
   // and therefore untestable.
   it('renders git log through the injected formatter', () => {
