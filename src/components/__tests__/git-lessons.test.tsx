@@ -45,3 +45,45 @@ describe('lesson deep link (D1.13)', () => {
     expect(screen.queryByText('Git commands covered:')).not.toBeInTheDocument()
   })
 })
+
+describe('score rendering (D2.5)', () => {
+  it('shows a badge for a legitimate score of 0 instead of a stray "0"', () => {
+    seed([
+      {
+        lessonId: 'git-basics',
+        lessonCompleted: true,
+        quizCompleted: true,
+        quizPassed: false,
+        quizScore: 0,
+      },
+    ])
+    render(<GitLessons initialLessonId="git-basics" />)
+
+    expect(screen.getByText('0%')).toBeInTheDocument()
+    // The old `quizScore &&` guard evaluated to 0, which React rendered as text
+    // next to the "required" line.
+    const requiredLine = screen.getByText(/required\)/).parentElement
+    expect(requiredLine?.textContent).not.toMatch(/\)\s*0\s*$/)
+  })
+
+  it('shows a badge for a score of 100', () => {
+    seed([passed('git-basics', 100)])
+    render(<GitLessons initialLessonId="git-basics" />)
+    expect(screen.getByText('100%')).toBeInTheDocument()
+  })
+
+  it('renders no percentage when a passed lesson has no recorded score', () => {
+    seed([
+      {
+        lessonId: 'git-basics',
+        lessonCompleted: true,
+        quizCompleted: true,
+        quizPassed: true,
+      },
+    ])
+    render(<GitLessons />)
+    // Previously this rendered a bare "%" with no number.
+    expect(screen.queryByText('%')).not.toBeInTheDocument()
+    expect(screen.queryByText('Quiz Score')).not.toBeInTheDocument()
+  })
+})

@@ -291,7 +291,9 @@ export function GitLessons({ initialLessonId = '' }: GitLessonsProps = {}) {
                     {lessonProgress?.quizPassed ? "✓" : "2."}
                   </span>
                   <span>Pass the quiz ({quiz?.passingScore}% required)</span>
-                  {lessonProgress?.quizScore && (
+                  {/* Truthiness hid a legitimate score of 0 and rendered the
+                      bare number 0 as a text node instead (D2.5). */}
+                  {typeof lessonProgress?.quizScore === 'number' && (
                     <Badge className={lessonProgress.quizPassed ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
                       {lessonProgress.quizScore}%
                     </Badge>
@@ -414,7 +416,9 @@ export function GitLessons({ initialLessonId = '' }: GitLessonsProps = {}) {
                       </div>
                     </div>
                   </div>
-                  {lessonProgress?.quizPassed && (
+                  {/* Also requires a score: quizPassed alone rendered a bare
+                      "%" when quizScore was absent (D2.5). */}
+                  {lessonProgress?.quizPassed && typeof lessonProgress.quizScore === 'number' && (
                     <div className="text-right">
                       <div className="text-sm font-semibold text-green-600 dark:text-green-400">
                         {lessonProgress.quizScore}%
