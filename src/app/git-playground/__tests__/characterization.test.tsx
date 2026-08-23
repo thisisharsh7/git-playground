@@ -1,0 +1,285 @@
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import GitPlaygroundPage from '@/app/git-playground/page'
+
+// Tab state lives in the route file, so the page needs these three hooks.
+// With useSearchParams mocked there is no suspension and the Suspense
+// fallback never renders.
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({ replace: vi.fn(), push: vi.fn(), prefetch: vi.fn(), back: vi.fn() }),
+  usePathname: () => '/git-playground',
+}))
+
+// These tests pin the CURRENT behaviour of executeCommand (page.tsx:132-247)
+// through the UI, before Phase 3 moves it into src/lib/git-engine.ts. A test
+// written after the extraction could not prove the extraction preserved
+// behaviour, which is why they exist now and must pass UNMODIFIED afterwards.
+//
+// Assertions of wrong-but-real output are deliberate. Where real git would
+// differ, a paired it.fails() states the correct behaviour and names the phase
+// that delivers it.
+
+const PLACEHOLDER = 'Type your Git command here...'
+
+// Command output is rendered into the transcript; reading body text keeps these
+// assertions independent of the markup Phase 3 will restructure.
+const out = () => document.body.textContent ?? ''
+
+async function settle() {
+  // executeCommand wraps its work in setTimeout(..., 300).
+  await act(async () => {
+    vi.advanceTimersByTime(300)
+  })
+}
+
+async function quick(label: string) {
+  fireEvent.click(screen.getByRole('button', { name: label }))
+  await settle()
+}
+
+async function type(command: string) {
+  fireEvent.change(screen.getByPlaceholderText(PLACEHOLDER), { target: { value: command } })
+  fireEvent.click(screen.getByRole('button', { name: 'Execute' }))
+  await settle()
+}
+
+beforeEach(() => {
+  vi.useFakeTimers()
+  render(<GitPlaygroundPage />)
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
+
+describe('initial state', () => {
+  it('seeds the transcript with git init and the first commit', () => {
+    expect(out()).toContain('Initialized empty Git repository in /project/.git/')
+    expect(out()).toContain('a1b2c3d')
+    expect(out()).toContain('Initial commit')
+  })
+
+  it('shows main as the only branch and two working-directory files', () => {
+    expect(out()).toContain('README.md')
+    expect(out()).toContain('index.html')
+    expect(screen.getByText('★ main')).toBeInTheDocument()
+  })
+
+  it('marks the newest commit as HEAD', () => {
+    expect(screen.getByText('HEAD')).toBeInTheDocument()
+  })
+})
+
+describe('supported commands', () => {
+  it('git status lists both files', async () => {
+    await quick('Status')
+    expect(out()).toContain('On branch main')
+    expect(out()).toContain('Changes not staged for commit:')
+  })
+
+  it('git add . stages everything', async () => {
+    await quick('Add All')
+    expect(out()).toContain('Added all files to staging area')
+    expect(screen.getAllByText('Staged')).toHaveLength(2)
+  })
+
+  it('git status after staging reports files as to-be-committed', async () => {
+    await quick('Add All')
+    await quick('Status')
+    expect(out()).toContain('Changes to be committed:')
+  })
+
+  it('git commit creates a commit and clears the staging area', async () => {
+    await quick('Add All')
+    await quick('Commit')
+    expect(out()).toMatch(/\[main \S+\] Update files/)
+    expect(screen.queryByText('Staged')).not.toBeInTheDocument()
+  })
+
+  it('git commit with nothing staged is rejected', async () => {
+    await quick('Commit')
+    expect(out()).toContain('nothing to commit, working tree clean')
+  })
+
+  it('git branch lists main as current', async () => {
+    await quick('Branches')
+    expect(out()).toContain('* main')
+  })
+
+  it('git branch feature creates a branch', async () => {
+    await quick('New Branch')
+    expect(out()).toContain("Created branch 'feature'")
+    expect(screen.getByText('feature')).toBeInTheDocument()
+  })
+
+  it('git branch feature twice is rejected', async () => {
+    await quick('New Branch')
+    await quick('New Branch')
+    expect(out()).toContain("fatal: A branch named 'feature' already exists.")
+  })
+
+  it('git checkout switches branch', async () => {
+    await quick('New Branch')
+    await quick('Checkout')
+    expect(out()).toContain("Switched to branch 'feature'")
+    expect(screen.getByText('★ feature')).toBeInTheDocument()
+  })
+
+  it('git checkout of a missing branch is rejected', async () => {
+    await quick('Checkout')
+    expect(out()).toContain(
+      "error: pathspec 'feature' did not match any file(s) known to git",
+    )
+  })
+
+  it('git log shows the seeded commit', async () => {
+    await quick('Log')
+    expect(out()).toContain('commit a1b2c3d')
+    expect(out()).toContain('Author: Developer')
+  })
+
+  it('git remote -v reports no remotes', async () => {
+    await quick('Remotes')
+    expect(out()).toContain('No remotes configured')
+  })
+
+  it('an unknown git subcommand is rejected', async () => {
+    await type('git push')
+    expect(out()).toContain("git: 'push' is not a git command. See 'git --help'.")
+  })
+
+  it('a non-git command is rejected', async () => {
+    await type('ls')
+    expect(out()).toContain('bash: ls: command not found')
+  })
+
+  it('whitespace-only input cannot be submitted', () => {
+    fireEvent.change(screen.getByPlaceholderText(PLACEHOLDER), { target: { value: '   ' } })
+    expect(screen.getByRole('button', { name: 'Execute' })).toBeDisabled()
+  })
+})
+
+// Each block pins the real current output first (so Phase 3 cannot change it
+// silently), then states the correct behaviour in an it.fails() that will begin
+// failing the moment Phase 4 lands the fix — forcing it to be converted.
+describe('pinned defects', () => {
+  describe('D1.9 git status never settles after a commit', () => {
+    it('pins: the same files stay committable forever', async () => {
+      await quick('Add All')
+      await quick('Commit')
+      await quick('Add All')
+      await quick('Commit')
+      // Two commits from one unchanged working directory.
+      expect(out().match(/\] Update files/g)).toHaveLength(2)
+    })
+
+    it.fails('a committed file should no longer be reported as modified', async () => {
+      await quick('Add All')
+      await quick('Commit')
+      await quick('Status')
+      expect(out()).toContain('nothing to commit, working tree clean')
+    })
+  })
+
+  describe('D1.3 git log has no ancestry model', () => {
+    it('pins: log is empty on a freshly created branch', async () => {
+      await quick('New Branch')
+      await quick('Checkout')
+      await quick('Log')
+      // Real git would list the inherited commit here. The transcript never
+      // gains it because commits are filtered by branch name.
+      expect(out()).not.toContain('commit a1b2c3d')
+    })
+
+    it.fails('a new branch should inherit its parent history', async () => {
+      await quick('New Branch')
+      await quick('Checkout')
+      await quick('Log')
+      expect(out()).toContain('commit a1b2c3d')
+    })
+  })
+
+  describe('D1.7 missing arguments succeed silently', () => {
+    it('pins: bare git add produces no output at all', async () => {
+      const before = out()
+      await type('git add')
+      // The command is echoed but carries no output and no error.
+      expect(out()).not.toContain('Nothing specified')
+      expect(out()).not.toContain('fatal')
+      expect(out().length).toBeGreaterThan(before.length)
+    })
+
+    it.fails('bare git add should report that nothing was specified', async () => {
+      await type('git add')
+      expect(out()).toContain('Nothing specified, nothing added.')
+    })
+  })
+
+  describe('D1.11 arguments are split on a single space', () => {
+    it('pins: a double space breaks the command', async () => {
+      await type('git  status')
+      expect(out()).toContain("git: '' is not a git command. See 'git --help'.")
+    })
+
+    it.fails('extra whitespace should be tolerated', async () => {
+      await type('git  status')
+      expect(out()).toContain('On branch main')
+    })
+  })
+
+  describe('D1.6 bare git interpolates undefined', () => {
+    it('pins: the literal string undefined is shown to the user', async () => {
+      await type('git')
+      expect(out()).toContain("git: 'undefined' is not a git command.")
+    })
+
+    it.fails('bare git should print usage, not undefined', async () => {
+      await type('git')
+      expect(out()).not.toContain('undefined')
+    })
+  })
+
+  describe('D1.4 and D1.5 flags are treated as branch names', () => {
+    it('pins: git checkout -b is rejected instead of creating a branch', async () => {
+      await type('git checkout -b feature')
+      expect(out()).toContain(
+        "error: pathspec '-b' did not match any file(s) known to git",
+      )
+    })
+
+    it('pins: git branch -d creates a branch literally named -d', async () => {
+      await type('git branch -d feature')
+      expect(out()).toContain("Created branch '-d'")
+    })
+
+    it.fails('git checkout -b should create and switch to the branch', async () => {
+      await type('git checkout -b feature')
+      expect(out()).toContain("Switched to a new branch 'feature'")
+    })
+  })
+
+  describe('D1.8 git commit does not require -m', () => {
+    it('pins: bare git commit uses a placeholder message', async () => {
+      await quick('Add All')
+      await type('git commit')
+      expect(out()).toMatch(/\[main \S+\] Commit message/)
+    })
+
+    it.fails('bare git commit should not invent a message', async () => {
+      await quick('Add All')
+      await type('git commit')
+      expect(out()).not.toContain('Commit message')
+    })
+  })
+
+  describe('D1.14 focus is dropped while a command runs', () => {
+    it('pins: the input and quick buttons are disabled during the 300ms delay', async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Status' }))
+      expect(screen.getByPlaceholderText(PLACEHOLDER)).toBeDisabled()
+      expect(screen.getByRole('button', { name: 'Status' })).toBeDisabled()
+      await settle()
+      expect(screen.getByPlaceholderText(PLACEHOLDER)).not.toBeDisabled()
+    })
+  })
+})
