@@ -19,6 +19,7 @@ vi.mock('next/navigation', () => ({
 }))
 
 const { PlaygroundTabs } = await import('@/components/playground/playground-tabs')
+const { default: GitPlaygroundPage } = await import('@/app/git-playground/page')
 
 function renderAt(query: string) {
   mocks.params = new URLSearchParams(query)
@@ -53,6 +54,13 @@ describe('?tab= deep links select the right panel', () => {
     expect(screen.getByRole('heading', { name: 'Git Command Reference' })).toBeInTheDocument()
   })
 
+  it('renders the commands heading at h2, below the page h1', () => {
+    renderAt('tab=commands')
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Git Command Reference' }),
+    ).toBeInTheDocument()
+  })
+
   it('selects the visualization', () => {
     renderAt('tab=visualization')
     expect(screen.getByRole('button', { name: 'Git Workflow' })).toBeInTheDocument()
@@ -81,6 +89,21 @@ describe('other query parameters are threaded through', () => {
     renderAt('tab=lessons&lesson=advanced-git')
     expect(screen.queryByText('Git commands covered:')).not.toBeInTheDocument()
   })
+})
+
+// The commands panel used to render its own h1, so the hydrated ?tab=commands
+// view had two. Checked on the whole page, across every tab state.
+describe('the hydrated page has exactly one h1', () => {
+  it.each(['', 'tab=playground', 'tab=lessons', 'tab=commands', 'tab=visualization', 'tab=bogus'])(
+    'for %p',
+    (query) => {
+      mocks.params = new URLSearchParams(query)
+      const { container } = render(<GitPlaygroundPage />)
+      const h1s = container.querySelectorAll('h1')
+      expect(h1s).toHaveLength(1)
+      expect(h1s[0].textContent?.trim()).toBe('Git Playground')
+    },
+  )
 })
 
 describe('tab bar', () => {

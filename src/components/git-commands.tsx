@@ -101,9 +101,12 @@ export function GitCommands({ initialSearch = '' }: GitCommandsProps) {
               <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-900 via-orange-800 to-amber-800 dark:from-white dark:via-orange-200 dark:to-amber-200 bg-clip-text text-transparent mb-4">
+          {/* h2, not h1: this renders inside a tab panel on /git-playground,
+              which already has its own page h1, so an h1 here produced two on
+              the hydrated ?tab=commands view. */}
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-900 via-orange-800 to-amber-800 dark:from-white dark:via-orange-200 dark:to-amber-200 bg-clip-text text-transparent mb-4">
             Git Command Reference
-          </h1>
+          </h2>
           <p className="text-base sm:text-lg lg:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto px-4">
             Comprehensive guide to Git commands with detailed explanations and worked examples
           </p>
