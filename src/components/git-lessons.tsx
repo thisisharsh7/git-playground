@@ -74,6 +74,57 @@ export const lessons: Lesson[] = [
   }
 ];
 
+// Unchanged storage key: existing users' progress must keep loading.
+const PROGRESS_KEY = 'git-lessons-progress';
+
+const freshProgress = (): LessonProgress[] =>
+  lessons.map(lesson => ({
+    lessonId: lesson.id,
+    lessonCompleted: false,
+    quizCompleted: false,
+    quizPassed: false
+  }));
+
+function isValidProgressEntry(value: unknown): value is LessonProgress {
+  if (typeof value !== 'object' || value === null) return false;
+  const entry = value as Record<string, unknown>;
+  return (
+    typeof entry.lessonId === 'string' &&
+    typeof entry.lessonCompleted === 'boolean' &&
+    typeof entry.quizCompleted === 'boolean' &&
+    typeof entry.quizPassed === 'boolean' &&
+    (entry.quizScore === undefined || typeof entry.quizScore === 'number')
+  );
+}
+
+/**
+ * Reads stored progress defensively. Previously this was a bare JSON.parse with
+ * no try/catch and no shape check, so a corrupt value threw inside the mount
+ * effect and — with no error boundary — blanked the whole Lessons tab, while a
+ * stored "null" produced setProgress(null) and a later TypeError (D2.7).
+ * Malformed entries are dropped; the key and the valid shape are untouched.
+ */
+function loadStoredProgress(): LessonProgress[] {
+  let raw: string | null;
+  try {
+    raw = localStorage.getItem(PROGRESS_KEY);
+  } catch {
+    return freshProgress();
+  }
+  if (!raw) return freshProgress();
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return freshProgress();
+  }
+  if (!Array.isArray(parsed)) return freshProgress();
+
+  const valid = parsed.filter(isValidProgressEntry);
+  return valid.length > 0 ? valid : freshProgress();
+}
+
 interface GitLessonsProps {
   /** Lesson to open on arrival, from `?lesson=` (D1.13). */
   initialLessonId?: string;
@@ -87,25 +138,17 @@ export function GitLessons({ initialLessonId = '' }: GitLessonsProps = {}) {
 
   // Load progress from localStorage on component mount
   useEffect(() => {
-    const savedProgress = localStorage.getItem('git-lessons-progress');
-    if (savedProgress) {
-      setProgress(JSON.parse(savedProgress));
-    } else {
-      // Initialize progress for all lessons
-      const initialProgress = lessons.map(lesson => ({
-        lessonId: lesson.id,
-        lessonCompleted: false,
-        quizCompleted: false,
-        quizPassed: false
-      }));
-      setProgress(initialProgress);
-    }
+    setProgress(loadStoredProgress());
   }, []);
 
   // Save progress to localStorage whenever it changes
   useEffect(() => {
     if (progress.length > 0) {
-      localStorage.setItem('git-lessons-progress', JSON.stringify(progress));
+      try {
+        localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+      } catch {
+        // Storage can be unavailable or full; progress stays in memory.
+      }
     }
   }, [progress]);
 

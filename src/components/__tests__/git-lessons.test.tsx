@@ -46,6 +46,49 @@ describe('lesson deep link (D1.13)', () => {
   })
 })
 
+describe('corrupt stored progress (D2.7)', () => {
+  it('survives malformed JSON and falls back to fresh progress', () => {
+    localStorage.setItem(KEY, '{not json')
+    expect(() => render(<GitLessons />)).not.toThrow()
+    expect(screen.getByText(/0 of 4 lessons completed/)).toBeInTheDocument()
+  })
+
+  it('survives a stored null', () => {
+    localStorage.setItem(KEY, 'null')
+    expect(() => render(<GitLessons />)).not.toThrow()
+    expect(screen.getByText(/0 of 4 lessons completed/)).toBeInTheDocument()
+  })
+
+  it('survives a stored object instead of an array', () => {
+    localStorage.setItem(KEY, '{"lessonId":"git-basics"}')
+    expect(() => render(<GitLessons />)).not.toThrow()
+    expect(screen.getByText(/0 of 4 lessons completed/)).toBeInTheDocument()
+  })
+
+  it('drops malformed entries and keeps the valid ones', () => {
+    localStorage.setItem(
+      KEY,
+      JSON.stringify([passed('git-basics'), null, 42, { lessonId: 'branching' }]),
+    )
+    render(<GitLessons />)
+    expect(screen.getByText(/1 of 4 lessons completed/)).toBeInTheDocument()
+  })
+
+  it('keeps the storage key and the valid shape on write', () => {
+    seed([passed('git-basics', 80)])
+    render(<GitLessons />)
+    const stored = JSON.parse(localStorage.getItem(KEY)!)
+    expect(Array.isArray(stored)).toBe(true)
+    expect(stored[0]).toEqual({
+      lessonId: 'git-basics',
+      lessonCompleted: true,
+      quizCompleted: true,
+      quizPassed: true,
+      quizScore: 80,
+    })
+  })
+})
+
 describe('overall progress (D2.6)', () => {
   it('reports 0 of 4 with no progress stored', () => {
     render(<GitLessons />)
