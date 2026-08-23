@@ -6,26 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle, XCircle, Clock, Trophy, ArrowRight, ArrowLeft } from 'lucide-react';
+import type { Quiz, QuizQuestion } from '@/types/quiz';
 
-export interface QuizQuestion {
-  id: string;
-  question: string;
-  type: 'multiple-choice' | 'true-false' | 'fill-blank';
-  options?: string[];
-  correctAnswer: string | number | boolean;
-  explanation: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-}
-
-export interface Quiz {
-  id: string;
-  lessonId: string;
-  title: string;
-  description: string;
-  questions: QuizQuestion[];
-  passingScore: number; // percentage
-  timeLimit?: number; // in minutes
-}
+export type { Quiz, QuizQuestion };
 
 interface QuizProps {
   quiz: Quiz;
